@@ -1,0 +1,129 @@
+This section introduces the idea of version control and applies it to a single-machine user.
+(This is sufficient for applying version control to confidential-data settings where you only work on one server.)
+A later section in the \textbf{Collaboration} block addresses using version control when sharing across machines.
+
+\subsection{Introduction to version control}
+
+Version control is the management of changes to code and documents.
+It should be applied to all textual content in a research project.
+Version control tools allow us to
+\begin{itemize}
+	\item Keep a complete history of our project without any additional effort or files
+	\item Hit ``undo'' (at arbitrarily large scale) at will
+	\item Collaboration: Edit code simultaneously without creating disastrous conflicts
+	\item Collaboration: Easily track coauthors' contributions and changes
+\end{itemize}
+All real programmers use version control. The dominant version control software is Git.
+
+To understand version control, please read the following short introductions:
+\begin{itemize}
+	\item Gentzkow \& Shapiro - ``\href{https://web.stanford.edu/~gentzkow/research/CodeAndData.pdf}{Chapter 3: Version Control}''
+	\item Michael Stepner - ``\href{https://michaelstepner.com/blog/git-vs-dropbox}{git vs. Dropbox from a researcher's perspective}''
+\end{itemize}
+
+\subsection{Which files should be kept in version control?}
+
+Version control is appropriate for any plaintext file.
+Binaries (like PDFs) are less suitable, since you can't examine their contents.
+
+Obviously all code should be in version control. What about writing?
+\begin{itemize}
+	\item \LaTeX\ is perfect; it's plaintext.
+	\item LyX is suitable for version control, because \texttt{.lyx} files are plaintext. 
+	\item Jonathan prefers to err on the side of documenting and committing too much. There's little downside.
+\end{itemize}
+
+A file called \texttt{.gitignore} identifies paths that should not be tracked by Git.
+\begin{itemize}
+\item 
+We don't commit data.
+I therefore typically put \texttt{tasks/*/output} in \texttt{.gitignore} so that the repository doesn't track output files.
+\item
+Git sees symbolic links as their targets.
+I therefore put \texttt{tasks/*/input} in \texttt{.gitignore} so that the repository doesn't track data files.
+\item 
+To produce logbook content (and the paper), you may want to commit tables and figures from these output folders.
+To do so, you can always type, for example, \texttt{git add table1.tex -f}, where the \texttt{-f} force option causes the file to be tracked despite the gitignore rule.
+\end{itemize}
+
+\subsection{Version control in a single-machine environment}
+
+To productively use git in a single-machine environment, you only need to know a half-dozen commands.
+\begin{itemize}
+\item \texttt{git init} initializes a repository in the current working directory
+\item \texttt{git status} tells you what files have been modified since you last committed
+\item \texttt{git diff} shows you those modifications (and can also show you the modifications between any two commits)
+\item \texttt{git add} stages a file 
+\item \texttt{git commit} commits a set of changes
+\item \texttt{git log} lists the history of commits
+\end{itemize}
+See ``\href{https://git-scm.com/book/en/v1/Git-Basics}{Git Basics}'' on these.
+
+A couple more resources:
+\begin{itemize}
+\item For command-line Git, see Atlassian's \href{https://www.atlassian.com/git/tutorials/atlassian-git-cheatsheet}{Git cheatsheet}.
+\item You may also want to glance at Jess Johnson - \href{http://www.grokcode.com/717/how-to-use-source-control-effectively/}{How To Use Source Control Effectively}.
+\item If your University subscribes to Lynda, they offer \href{https://www.lynda.com/search?q=git}{a number of Git courses} (with which I have no experience).
+\end{itemize}
+
+
+
+
+Some notes on command-line Git by Ningyin Xu, a former RA, follow.
+
+\subsubsection{Setting up a repository}
+
+If you want to create a brand-new repo, you'll use the \texttt{git init} command. 
+\begin{lstlisting}[language=bash]
+cd /path/to/your/existing/project 
+git init
+\end{lstlisting}
+
+\subsubsection{Saving changes to the repository}
+Now that we have a repository, we can edit its contents and then commit changes to it.
+The basic commands are:
+\begin{lstlisting}[language=bash]
+cd /path/to/repo 
+# make some changes to a file named "test.txt"
+git add test.txt
+git commit -m "edited test.txt"
+\end{lstlisting}
+This example introduced two additional git commands: \texttt{add} and \texttt{commit}.
+The \texttt{git add} command adds a change in the working directory to the staging area.
+It tells Git that you want to include updates to a particular file in the next commit.
+However, \texttt{git add} doesn't really affect the repository in any significant way — changes are not actually recorded until you run \texttt{git commit}.
+The \texttt{git commit} command commits the staged snapshot to the project history.
+Committed snapshots can be thought of as ``saved'' versions of a project, Git will never change them unless you explicity ask it to.
+In conjunction with these commands, you'll also need \texttt{git status} to view the state of the working directory and the staging area.
+In general cases, you could do ``git status'' before ``git add'', and Git will tell you what files you have made changes and how you could deal with them.
+
+Another common use case for \texttt{git add} is the \texttt{--all} option. 
+Executing \texttt{git add --all} will take any changed and untracked files in the repo and
+add them to the repo and update the repo's working tree.
+This may include hidden files. 
+You should list files that you do not want to be part of the repository in the file called \texttt{.gitignore} (\href{https://git-scm.com/docs/gitignore}{documentation}).
+
+
+\subsubsection{Undoing changes}
+The \texttt{git checkout} command is mostly used for its three functions: 
+checking out files, checking out commits, and checking out branches.
+Checking out a commit makes the entire working directory match that commit.
+This can be used to view an old state of your project without altering your current state in any way.
+Checking out a file lets you see an old version of that particular file, leaving the rest of your working directory untouched.
+Checking out branches will be discussed in the \textbf{Collaboration} section.
+\\
+\begin{lstlisting}[language=bash]
+git checkout <commit> <file>
+# Check out a previous version of a file. This turns the <file> that resides 
+# in the working directory into an exact copy of the one from <commit> and 
+# adds it to the staging area.
+
+git checkout <commit>
+# Update all files in the working directory to match the specified commit. 
+# But this is a read-only operation, the ``current'' state of your project 
+# remains untouched in the master branch.
+
+git checkout master
+# This lets you to get back to the "current" state (under the condition you
+# don't have more than one branches).
+\end{lstlisting}

@@ -1,0 +1,32 @@
+This chapter is intended to introduce everyone to technology or tools that are integral to our workflow.
+It describes our research infrastructure in terms of three types of issues:
+\begin{itemize}
+\item \textbf{Code}: organize it, write it, run it, track it
+\item \textbf{Collaboration}: assigning tasks, sharing code, reviewing code, reporting results
+\item \textbf{Computing}: geeky details
+\end{itemize}
+
+We organize the project as a series of tasks, so our organization of code and data takes a task-based perspective.
+After writing code, we automate its execution via \texttt{make}.
+We track our code (and the rest of the project) using \texttt{Git}, a version control system.
+Collaboration occurs via Asana task assignments, BitBucket code reviews, and logbook entries that share research designs and results.
+
+Use a good text editor like \href{https://www.sublimetext.com/}{SublimeText} or \href{https://atom.io/}{Atom} to write code, slides, and papers.
+\href{http://plain-text.co/write-and-edit.html}{Word processors aren't text editors}.
+Your text editor should, at minimum, offer you
+\href{https://en.wikipedia.org/wiki/Syntax_highlighting}{syntax highlighting},
+\href{https://en.wikipedia.org/wiki/Command-line_completion}{tab autocomplete},
+and \href{https://www.sublimetext.com/}{multiple selection}.
+
+Our approach assumes that you'll use Unix/Linx/MacOSX.
+Plain-text social science lives at the *nix command line.
+\href{https://github.com/gslab-econ/ra-manual/wiki/Getting-Started}{Gentzkow and Shapiro}: ``The command line is our means of implementing tools.''
+Here are two intros to the Linux shell:
+\begin{itemize}
+	\item \url{https://ryanstutorials.net/linuxtutorial/}
+	\item \url{http://swcarpentry.github.io/shell-novice/}
+\end{itemize}
+Getting started at the command line can be a little overwhelming, but it's well worth it.
+While you can use GUI apps to interact with most of our workflow (e.g., SourceTree for version control),
+automation of some key parts relies on shell scripts.
+See logbook entry \ref{entry:unixshelltips} for an assorted collection of tips.

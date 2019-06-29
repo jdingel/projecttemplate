@@ -1,0 +1,28 @@
+Jonathan prefers Julia to Matlab.
+Jonathan learned Julia by starting with the \href{https://lectures.quantecon.org/jl/index_learning_julia.html}{QuantEcon introduction to Julia}.
+
+Here are some helpful resources:
+\begin{enumerate}
+\item \url{https://julialang.org/}: for installation and general info about julia: blogs, publications, conference
+\item \url{https://docs.julialang.org/en/stable/manual/introduction/}: excellent manual for julia
+\item \url{https://lectures.quantecon.org/jl/}: also an excellent manual for Julia with a macro vibe
+\item \url{https://github.com/bkamins/Julia-DataFrames-Tutorial}: excellent tutorial on how to read/use DataFrames in Julia
+\item \url{https://www.juliabloggers.com/}: to keep up with advancements in Julia
+\item \url{http://www.johnmyleswhite.com/}: for interesting discussions about performance in Julia 
+\end{enumerate}
+
+List of very useful packages:
+\begin{itemize}
+\item \url{https://github.com/JuliaData/DataFrames.jl}: DataFrames in Julia
+\item \url{https://github.com/davidanthoff/ReadStat.jl}: read dta files in Julia
+\item \url{https://github.com/JuliaIO/JLD.jl}: fantastic way of storing output in Julia
+\item \url{https://github.com/JuliaNLSolvers/Optim.jl}: General optimization in julia
+\item \url{https://github.com/johnmyleswhite/Calculus.jl}: for automatic diffentiation in Julia (very practical to check your analytical expressions of gradients and hessians)
+\end{itemize}
+
+Notes on using Julia on UChicago's Midway computing cluster:
+\begin{itemize}
+	\item You cannot connect to the external internet from Midway's compute nodes. 
+	Julia's packages are pulled from Github, so you must install packages in Julia (and in Stata) when running on a login node.
+	\item You can \texttt{Pkg.activate(".")} on a compute node, but you cannot \texttt{Pkg.instantiate()} on a compute node. You need to install packages, define the \texttt{Project.toml}, \texttt{Pkg.instantiate()} and precompile (\texttt{using} commands once) on a login node before moving to the compute nodes.  
+\end{itemize}

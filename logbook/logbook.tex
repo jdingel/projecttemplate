@@ -1,0 +1,112 @@
+\documentclass{report}
+
+%%METADATA
+\title{Logbook for project}
+\author{
+Jonathan I. Dingel \\ {Chicago Booth} \and
+coauthors
+}
+\date{}
+
+%%PACKAGES
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{setspace}
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage[hyphens]{url}
+\usepackage{natbib}
+\usepackage[font=normalsize,labelfont=bf]{caption}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue,citecolor=red}
+\usepackage{enumerate}% http://ctan.org/pkg/enumerate %Supports lowercase Roman-letter enumeration
+\usepackage{verbatim} %Package with \begin{comment} environment
+\usepackage{physics}
+\usepackage{tikz}
+\usepackage{listings}
+\usepackage{upquote}
+\usepackage{booktabs} %Package with \toprule and \bottomrule
+\usepackage{etoc}     %Package with \localtableofcontents
+\usepackage{multicol}
+\usepackage{bm}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{language=bash,
+  frame=tb,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=false,
+  tabsize=3
+}
+
+\input{./entries/listings-stata.tex}   %From https://gist.github.com/mcaceresb/b40d6059cf66cc73423f4ddf3f72acda
+
+%%FORMATTING
+\onehalfspacing
+\numberwithin{equation}{section}
+\numberwithin{figure}{section}
+\numberwithin{table}{section}
+\bibliographystyle{aea}
+
+%LOGBOOK
+\begin{document}
+
+%%LOGBOOK COVER
+\maketitle
+
+%TABLE OF CONTENTS
+\renewcommand{\thechapter}{\Alph{chapter}}
+\setcounter{tocdepth}{1}
+\tableofcontents
+\etocsettocstyle{}{} % from now on only local tocs
+
+%%NON-CHRONOLOGICAL ENTRIES
+\chapter{Research infrastructure}
+\input{entries/researchinfrastructure.tex}
+
+\section{Task-based organization of code and data} \input{./entries/tasks.tex}
+\section{Writing code} \input{./entries/codestylesheet.tex}
+\section{Running code with Make} \input{./entries/make.tex}
+\section{Tracking code with Git} \input{./entries/git_alone.tex}
+
+\section{Task assignments on Asana} \input{./entries/asana.tex}
+\section{Sharing code via Git} \input{./entries/git_together.tex}
+\section{Reviewing code on BitBucket} \input{./entries/codereview.tex}
+\section{Sharing results via the logbook} \input{./entries/logbookexplained.tex}
+
+\section{Unix/Linux shell commands} \input{./entries/unixshelltips.tex}
+\section{Aesthetics} \input{./entries/visualization.tex}
+\section{Notes on Julia} \input{./entries/juliaintro.tex}
+
+
+%%LOGBOOK ENTRIES: Call notes
+\chapter{Call notes}
+
+%%LOGBOOK ENTRIES: Research design
+\chapter{Research design}
+
+%%LOGBOOK ENTRIES: Data description
+\chapter{Data description}
+
+%%LOGBOOK ENTRIES: Research results
+\chapter{Research results}
+
+%%LOGBOOK ENTRIES: FEEDBACK
+\chapter{Feedback}
+
+%%LOGBOOK BIBLIOGRAPHY
+
+
+\end{document}

@@ -1,0 +1,128 @@
+\label{entry:unixshelltips}
+
+This section documents basic Unix commands and then some clever combinations for tasks we often encounter during research.
+At the command line, type \texttt{man <<command>>} to get the \href{https://en.wikipedia.org/wiki/Man_page}{manual page} for \texttt{<<comand>>}.
+
+\subsection{Mac OS X is Unix and POSIX-compliant, not GNU/Linux}
+
+Mac OS X is based on the Darwin operating system, which is based on BSD.
+It \href{https://www.opengroup.org/openbrand/register/apple.htm}{counts as UNIX} and is POSIX-compliant.
+But it is not GNU/Linux. 
+You will therefore run into annoying differences when trying to use some utilities, mostly when you see a solution on StackExchange that works on GNU/Linux but doesn't work on Mac OS X.
+Here's a short list:
+\begin{itemize}
+\item \texttt{tree} not available in OS X
+\item \texttt{cut } lacks the complement option in OS X
+\item \texttt{sed -i} option syntax \href{https://stackoverflow.com/questions/2320564/i-need-my-sed-i-command-for-in-place-editing-to-work-with-both-gnu-sed-and-bsd}{differs} between Linux and OS X
+\end{itemize}
+
+
+\subsection{Navigating the file system}
+
+\begin{itemize}
+	\item \texttt{pwd}: identify the ``present working directory''
+	\item \texttt{cd}: ``change directory'' to the named destination (e.g., \texttt{cd <<destination>>})
+	\item \texttt{ls -lht}: lists the current directory's contents. The \texttt{-lht} options list the files in detail, with human-readable file sizes, ordered by time last modified.
+	\item \href{https://en.wikipedia.org/wiki/Command-line_completion}{tab completion}: You do not have to type a complete filename. Starting typing the file name and hit the \texttt{tab} key. Commands with long or difficult to spell filenames can be entered by typing the first few characters and pressing a completion key, which completes the command or filename.
+	\item To recall a command from your \href{https://www.howtogeek.com/howto/44997/how-to-use-bash-history-to-improve-your-command-line-productivity/}{history}, type \texttt{ctrl-R} to search and type a fragment of the command
+	\item hashtag comments: comments in the shell are set off by \texttt{\#}. add a comment to your command to tag it for easier retrieval via search in the future
+	\item copy files using \texttt{cp}, move files using \texttt{mv}
+	\item copy files across different servers using \href{https://kb.iu.edu/d/agye}{scp}
+\end{itemize}
+
+\subsection{Navigating text}
+
+\begin{itemize}
+	\item \texttt{ctrl-A} jumps to beginning of line
+	\item \texttt{ctrl-E} jumps to end of line
+	\item \texttt{ctrl-K} kills content (cuts) from cursor to end of line
+	\item \texttt{ctrl-U} kills content (cuts) from cursor to beginning of line
+\end{itemize}
+
+\subsection{Piping and writing to file}
+A \href{https://en.wikipedia.org/wiki/Pipeline_(Unix)}{pipeline} is a sequence of processes chained together by their standard streams, so that the output of each process feeds directly as input to the next one.
+Pipe using \texttt{|}.
+
+To write output to a file, use \texttt{>}.
+This overwrites the file if it already exists.
+Use \texttt{>>} to append to an existing file.
+
+
+\begin{itemize}
+	\item parse a directory listing using \texttt{grep}: the command 
+	\begin{verbatim}ls -l | grep 'key'\end{verbatim}
+	will output the directory listing and select only the lines containing the phrase ``key''
+	\item write hello world to a file:
+	\begin{verbatim}echo 'hello world' > file.txt\end{verbatim}
+	\item look for missing files in a numbered sequence:
+		  \begin{verbatim}
+		  ls ../output/isoindices_{1..500}.dta > /dev/null
+		  \end{verbatim}
+		  This returns only the files that are not found in that \href{http://www.thelinuxrain.com/articles/building-sequences-of-numbers-on-the-command-line}{sequence}.
+		  (the null device is a device file that discards all data written to it but reports that the write operation succeeded)
+\end{itemize}
+
+\subsection{Text processing}
+
+\begin{itemize}
+	\item \texttt{cat}: Reads files sequentially, writing them to standard output. The name is derived from its function to concatenate files. At the command line, think of this as ``print the file''.
+	\item \texttt{head -n <filename>} outputs the first \texttt{n} lines of the file. the default is ten lines
+	\item \texttt{tail -n <filename>} outputs the last \texttt{n} lines of the file. the default is ten lines
+	\item \texttt{grep}: returns all lines of a file matching a specified expression (use \texttt{-v} option to return all lines not containing the expression)
+	\item \texttt{sed}: stream editor with many functions; I mostly use it to substitute one expression for another
+	\item \texttt{awk}: find and replace text, print columns, a number of other text editing functions
+	\item \texttt{paste}: horizontally concatenate files with equal number of lines
+\end{itemize}
+
+\subsection{Emacs}
+
+Most often, you'll be an environment where you get to choose your own text editor.
+However, in some (i.e., confidential) computing environments, you will not be free to install arbitrary software.
+Emacs will typically be installed everywhere, so it it worth knowing some basic info.
+
+\href{https://en.wikipedia.org/wiki/Emacs}{Emacs} is a family of text editors, dating to the 1970s, that is ``the extensible, customizable, self-documenting, real-time display editor.''
+But there's a learning curve.
+Even \href{https://www.gnu.org/software/emacs/tour/}{the introductions} can be overwhelming.
+
+With regard to Emacs \href{https://www.emacswiki.org/emacs/EmacsKeyNotation}{key notation},
+\texttt{C} means the ``control'' key and \texttt{M} means the alt/option key.
+
+\begin{itemize}
+	\item Quitting/exiting: \texttt{C-x C-c}
+	\item Saving: \texttt{C-x C-s}
+	\item \href{https://www.emacswiki.org/emacs/CopyAndPaste}{Copy and paste}: 
+	The selected region is where your cursor is relative to where you set a mark.
+	Set a mark with C-space.
+	Then move your cursor to end of region and hit C-w to cut (kill) or M-w to copy.
+	Paste using C-y (yank).
+
+\end{itemize}
+
+\subsection{Slurm}
+
+Read the \href{https://rcc.uchicago.edu/docs/using-midway/index.html#batch-jobs}{RCC introduction} and then head over to the \href{https://slurm.schedmd.com/overview.html}{official documentation}.
+
+\begin{itemize}
+	\item \texttt{sbatch}: this command submits jobs (\texttt{.sbatch} scripts) to the job scheduler on the cluster
+	\item \texttt{sinteractive}: start an interactive session on the server
+	\item \texttt{squeue --user=jdingel}: list running and queued jobs for the relevant users
+	\item My preferred \texttt{squeue} command is the following:
+	\begin{lstlisting}[language=bash]
+	squeue --user=jdingel  --format="\%.17i \%.13P \%.20j \%.8u \%.8T \%.9M \%.9l \%.6D \%R" #jdjobs
+	\end{lstlisting}
+	This provides a good bit more information about each job.
+	\item \texttt{rcchelp sinfo}: produce a summary of the partitions on Midway
+	\item How to only see really costly jobs: 
+	\begin{lstlisting}[language=bash]
+	rcchelp usage --byjob | grep '[0-9][0-9][0-9]\.[0-9][0-9][[:blank:]]|'
+	\end{lstlisting}
+	Without options, \texttt{rcchelp usage --byjob} provides a complete history of job submissions.
+	Piping it to grep to select only lines containing a number in the form \#\#\#.\#\# returns only jobs that used at least 100 service units.
+\end{itemize}
+
+\subsection{Other resources}
+
+\begin{itemize}
+	\item \url{https://unix.stackexchange.com/questions/6/what-are-your-favorite-command-line-features-or-tricks}
+	\item UChicago \href{https://rcc.uchicago.edu/support-and-services/workshops-and-training}{RCC Workshops and Training}
+\end{itemize}

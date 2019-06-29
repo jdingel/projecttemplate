@@ -1,0 +1,101 @@
+This section is for us to agree upon best practices in coding.
+It's light at the moment.
+
+\subsection{Language-free coding principles}
+
+\subsubsection{Other people's principles}
+
+\begin{itemize}
+	\item See chapter 6, chapter 7, and appendix A of Gentzkow and Shapiro's \href{https://web.stanford.edu/~gentzkow/research/CodeAndData.pdf}{Code and Data for the Social Sciences: A Practitioner’s Guide}.
+\end{itemize}
+
+\subsubsection{Do not hardcode values}
+
+While I haven't fully embraced the \href{https://en.wikipedia.org/wiki/Functional_programming}{functional programming paradigm},
+I do think that it is a mistake to use global variables or to hardcode values within functions.
+See 
+Patrick Ball's \href{https://www.youtube.com/watch?v=ZSunU9GQdcI&t=36m43s}{argument} 
+and
+page 28 of Gentzkow and Shapiro's \href{https://web.stanford.edu/~gentzkow/research/CodeAndData.pdf}{Code and Data}.
+
+For example, sample selection decisions are arguments.
+Constants do not belong inside functions.
+Name them once, impose the value/criterion once, and then refer to that repeatedly within your function.
+\href{http://yaml.org/}{YAML} is a good format for constants.
+
+\subsection{Sharing code across machines}
+
+We almost always want to run code on multiple machines.
+Absolute file paths are problematic for shared code, because \texttt{/Users/jdingel/} is not a valid path for almost every computer on earth.
+Here are two possible means of making shared code run on many machines: 
+\begin{enumerate}
+	\item Set absolute file paths with conditional statements.
+	\item Use only relative file paths.
+\end{enumerate}
+
+I strongly prefer the latter.
+
+\subsubsection{Conditional absolute file paths}
+
+Conditional absolute file paths exploit environmental variables to identify the machine and then set absolute file paths based on that.
+For example, in Linux there is an environmental variable called \texttt{\$USER} at the shell command line.
+Similarly, elements of Stata's c-class, such as \texttt{`c(pwd)'} and \texttt{`c(hostname)'}, can be used to identify a machine 
+and then run user-specific programs that set global variable to user-specific values.\footnote{
+	Type \texttt{help creturn} in Stata for exhaustive documentation of the available arguments.
+}
+Here is a brief example in Stata.
+\begin{lstlisting}[language=stata]
+if "`c(os)'"=="Unix" & regexm("`c(hostname)'","midway")==1 {
+	display "Running on RCC Midway server"
+	global root "/project/xxx/xxxyyy/xyz_repo"
+}
+\end{lstlisting}
+
+\subsubsection{Relative file paths}
+
+Relative file paths work on any machine because they are relative.
+In Jonathan's opinion, this is generally preferable.
+It means that code can be cloned onto a new machine by any user and run immediately without having to write new user-specific code.
+See \url{https://github.com/jdingel/DavisDingelMonrasMorales} for an example of a repository that only uses relative paths.
+
+\href{https://help.github.com/articles/about-readmes/\#relative-links-and-image-paths-in-readme-files}{GitHub} agrees:
+``Relative links are easier for users who clone your repository. Absolute links may not work in clones of your repository - we recommend using relative links to refer to other files within your repository.''
+
+\subsection{Limit lines to at most 100 characters}
+
+Files should have lines no longer than 100 characters in length.
+This is true both for code and \TeX.
+The commands \texttt{diff} and \texttt{git diff} report lines that differ between files/commits.
+Really long lines of code therefore can be a nightmare, since one may have to scroll quite far to spot a change.
+This is really painful if a line is actually a full paragraph of text.
+Writing each new sentence on a separate line makes it much easier to view changesets.
+
+See \href{https://en.wikibooks.org/wiki/LaTeX/Collaborative_Writing_of_LaTeX_Documents\#Subversion_really_makes_the_difference}{Directives for using LaTeX with version control systems}
+\begin{itemize}
+\item Do not change line breaks without good reason.
+\item Turn off automatic line wrapping of your LaTeX editor.
+\item Start each new sentence in a new line.
+\item Split long sentences into several lines so that each line has at most about 80 characters.
+\item Verify that your code can be compiled flawlessly before committing your modifications to the repository.
+\item Use diff to critically review your modifications before committing them to the repository.
+\item Add a meaningful and descriptive comment when committing your modifications to the repository.
+\end{itemize}
+
+\subsection{Stata code suggestions}
+
+\subsubsection{Temporary files}
+Stata loads at most one dataset at a time, 
+thus opening a dataset will cause Stata to discard the dataset that is currently in memory.
+This constraint may push you to consider saving lots of intermediate output or temporary files to the \texttt{output} folder of your task.
+Don't.
+Use Stata's \texttt{tempfile} command instead.
+
+Here is a trivial example
+\begin{lstlisting}[language=Stata]
+clear
+use "exampw1.dta", clear
+tempfile temp1    // create a temporary file
+save "`temp1'"      // save memory into the temporary file
+use "exampw2.dta", clear
+merge 1:1 v001 v002 v003 using "`temp1'" // use the temporary file
+\end{lstlisting}
