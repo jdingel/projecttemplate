@@ -69,10 +69,20 @@ Use \texttt{>>} to append to an existing file.
 	\item \texttt{head -n <filename>} outputs the first \texttt{n} lines of the file. the default is ten lines
 	\item \texttt{tail -n <filename>} outputs the last \texttt{n} lines of the file. the default is ten lines
 	\item \texttt{grep}: returns all lines of a file matching a specified expression (use \texttt{-v} option to return all lines not containing the expression)
+	\begin{itemize}
+		\item how to \href{https://stackoverflow.com/questions/29465612/how-to-detect-invalid-utf8-unicode-binary-in-a-text-file}{detect invalid utf8} unicode/binary in a text file: \texttt{grep -axv '.*' file.txt}
+	\end{itemize}
 	\item \texttt{sed}: stream editor with many functions; I mostly use it to substitute one expression for another
 	\item \texttt{awk}: find and replace text, print columns, a number of other text editing functions
+	\begin{itemize}
+		\item \href{https://developer.ibm.com/tutorials/l-awk1/}{An intro to the great language with the strange name} (Daniel Robbins, 1 Dec 2000)
+		\item \href{https://gregable.com/2010/09/why-you-should-know-just-little-awk.html}{Why you should learn just a little Awk} (Greg Grothaus, 29 Sep 2010)
+	\end{itemize}
 	\item \texttt{paste}: horizontally concatenate files with equal number of lines
 \end{itemize}
+
+Combine these well and you get something like 
+``\href{https://adamdrake.com/command-line-tools-can-be-235x-faster-than-your-hadoop-cluster.html}{Command-line Tools can be 235x Faster than your Hadoop Cluster}''.
 
 \subsection{Emacs}
 
@@ -98,9 +108,15 @@ With regard to Emacs \href{https://www.emacswiki.org/emacs/EmacsKeyNotation}{key
 
 \end{itemize}
 
-\subsection{Slurm}
+\subsection{Multiple ``windows''}
+
+\href{https://www.gnu.org/software/screen/manual/}{Screen} is ``a full-screen window manager that multiplexes a physical terminal between several processes, typically interactive shells.''
+Consider using this if you want, e.g., to run Stata interactively in the bottom half of your screen while working on your do file in a text editor in the top half.
+
+\subsection{Slurm (Simple Linux Utility for Resource Management)}
 
 Read the \href{https://rcc.uchicago.edu/docs/using-midway/index.html#batch-jobs}{RCC introduction} and then head over to the \href{https://slurm.schedmd.com/overview.html}{official documentation}.
+This \href{https://slurm.schedmd.com/pdfs/summary.pdf}{two-page PDF} lists almost all the relevant commands you might need.
 
 \begin{itemize}
 	\item \texttt{sbatch}: this command submits jobs (\texttt{.sbatch} scripts) to the job scheduler on the cluster
@@ -124,5 +140,6 @@ Read the \href{https://rcc.uchicago.edu/docs/using-midway/index.html#batch-jobs}
 
 \begin{itemize}
 	\item \url{https://unix.stackexchange.com/questions/6/what-are-your-favorite-command-line-features-or-tricks}
+	\item MIT's \href{https://hacker-tools.github.io/}{Hacker Tools} course
 	\item UChicago \href{https://rcc.uchicago.edu/support-and-services/workshops-and-training}{RCC Workshops and Training}
 \end{itemize}
