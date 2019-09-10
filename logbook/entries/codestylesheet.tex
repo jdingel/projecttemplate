@@ -83,6 +83,16 @@ See \href{https://en.wikibooks.org/wiki/LaTeX/Collaborative_Writing_of_LaTeX_Doc
 
 \subsection{Stata code suggestions}
 
+\subsubsection{Command-line execution}
+
+A few Stata commands only work in ``interactive'' mode and not when Stata is invokved at the command line.
+\begin{itemize}
+	\item \texttt{graph export}: 
+	``ps and eps are available for all versions of Stata; png and tif are available for all versions of Stata except Stata(console) for Unix; pdf is available only for Stata for Windows and Stata for Mac.''
+	See \url{https://www.stata.com/manuals13/g-2graphexport.pdf#g-2graphexport}.
+\end{itemize}
+
+
 \subsubsection{Temporary files}
 Stata loads at most one dataset at a time, 
 thus opening a dataset will cause Stata to discard the dataset that is currently in memory.
@@ -99,3 +109,17 @@ save "`temp1'"      // save memory into the temporary file
 use "exampw2.dta", clear
 merge 1:1 v001 v002 v003 using "`temp1'" // use the temporary file
 \end{lstlisting}
+
+\subsubsection{Evaluating inequalities}
+In Stata, missing numeric observations take the value of positive infinity.
+Thus, when evaluating inequalities, $.>X$ is true for any $X$.
+I prefer using the command \texttt{inrange( )} to avoid this issue.
+Consider the following two ways of generating a dummy indicating that x1 takes a positive value:
+\begin{lstlisting}[language=Stata]
+gen byte positive1 = 1 if x1>=0
+gen byte positive2 = (inrange(x1,0,.)==1)
+\end{lstlisting}
+The first command will cause positive1 to be true if x1 is non-negative or if x1 is missing.
+By contrast, the second command will set positive2 to true only if x1 is non-negative and non-missing.
+
+

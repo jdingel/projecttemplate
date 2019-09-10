@@ -43,24 +43,68 @@ if there is one recipe that produces all those outputs jointly.
 For example, instead of having a script \texttt{create\_symlinks.sh} that tries to produce the symbolic links for every input file,
 you can write a recipe for every symbolic link in which the symbolic link in the task's \texttt{input} folder is a target.
 When one of those symbolic links fails to be created, Make will tell you which symbolic link didn't work, making it easier to identify the problematic/missing input upstream.
+\item \href{https://www.gnu.org/software/make/manual/html_node/Automatic-Variables.html}{Automatic variables} take values computed when the rule is executed based on the target and pre-requisites of the rule. 
+Commonly used automatic variables include 
+the file name of the target of the rule \texttt{\$@},
+the name of the first pre-requisite \texttt{\$<},
+and
+the file-within-directory part of the file name of the target \texttt{\$(@F)}.
+
 \end{itemize}
 
 A note on running Makefiles in a cluster computing environment that has a job scheduler:
 \begin{itemize}
-	\item A problem with batch jobs is that the shell sees the submission command as completed upon job submission, before any output files are produced.
+	\item A problem with batch jobs is that the shell sees the submission command as completed upon job submission any output files are produced.
 	Failing to see the output, Make will repeatedly submit the job.
 	\item You need the job submission command to not exit back to the shell until the job completes, so that the target will be produced before Make evaluates that recipe's success or failure.
-	\item With \texttt{sbatch} at Chicago Midway, use \texttt{sbatch -W}.
 	\item With \texttt{qsub} at Census RDC, use \texttt{qsub -W block=true}.
+	\item With \texttt{sbatch} at Chicago Midway, use \texttt{sbatch -W}.
 	\item Read \url{http://wresch.github.io/2012/11/01/qsub-submit-jobs-from-makefile.html} for more discussion of \texttt{qsub} and the \texttt{sbatch} \href{https://slurm.schedmd.com/sbatch.html}{manual} for discussion of \texttt{-W} or \texttt{--wait}. 
 \end{itemize}
 
-Pages of the \texttt{Make} manual I find myself often consulting:
-\begin{itemize}
-	\item \href{https://www.gnu.org/software/make/manual/html_node/Prerequisite-Types.html}{4.3 Types of Prerequisites}
-	\item \href{https://www.gnu.org/software/make/manual/html_node/Multiple-Targets.html}{4.10 Multiple Targets in a Rule}
-	\item \href{https://www.gnu.org/software/make/manual/html_node/Static-Usage.html}{4.12.1 Syntax of Static Pattern Rules}
-	\item \href{https://www.gnu.org/software/make/manual/html_node/Automatic-Variables.html}{10.5.3 Automatic Variables}
-\end{itemize}
+\subsection{Some simple examples of Makefiles}
+Here is an example of what a Makefile in an ``initialdata" task folder might do.
+The following code is an excerpt from a Makefile that downloads Census data and produces a CSV by unzipping the downloaded file.
+\begin{lstlisting}[language=make]
+../output/mi_od_main_JT01_2010.csv.gz: | ../output/
+	wget "https://lehd.ces.census.gov/data/lodes/LODES7/mi/od/$(@F)" -O ../output/$(@F)
+../output/mi_od_main_JT01_2010.csv: ../output/mi_od_main_JT01_2010.csv.gz
+	gunzip -c $< > $@
+\end{lstlisting}
+For the first two lines above, \texttt{wget} is a free utility for non-interactive download of files from the web and \texttt{-O} is an option that concatenate all documents together and writes to the specified output file. 
+The automatic variable \texttt{\$(@F)} equals \texttt{mi\_od\_main\_JT01\_2010.csv.gz},
+the file-within-directory part of the file name of the target. 
+It is used in specify the web address of the Census file.
+Note that \texttt{../output/} is an (order-only) pre-requisite of this target.
+If that directory does not exist, the Makefile must provide a recipe to create it.
 
-O'Reilly's \href{https://www.oreilly.com/openbook/make3/book/ch12.pdf}{``Debugging Makfiles'' chapter} is helpful.
+The second rule concerns the target \texttt{../output/mi\_od\_main\_JT01\_2010.csv}.
+If the target  does not exist or if the target is older than (any of) the pre-requisite(s) listed after the colon,
+then the recipe for that target is executed.
+\href{https://linux.die.net/man/1/gunzip}{\texttt{gunzip}} takes a list of files on its command line and replaces each file whose name ends with .gz, -gz, .z, -z, \_z or .Z and which begins with the correct magic number with an uncompressed file without the original extension. 
+\texttt{-c} is an option that writes output on standard output and keeps original files unchanged. 
+\texttt{\$<} is the name of the first pre-requisite, \texttt{../output/mi\_od\_main\_JT01\_2010.csv.gz} and \texttt{\$@} is the file name of the target, \texttt{../output/mi\_od\_main\_JT01\_2010.csv}.
+\texttt{>} redirects output to a file, overwriting the file. 
+(By the way, \texttt{>>} appends redirected output to the end of a file (rather than overwriting).) 
+Therefore, the fourth line in the example above uncompresses the pre-requisite and writes the output to the target.
+
+If you type \texttt{make ../output/mi\_od\_main\_JT01\_2010.csv} at the command line, \texttt{make} will try to make the CSV target and see the CSV.GZ file as a pre-requisite. 
+If the pre-requisite has not been already downloaded, \texttt{make} will first run the recipe to produce that CSV.GZ file (the \texttt{wget} command) and then execute the recipe to produce the target.
+
+After obtaining the initial data, we will likely use these data in multiple downstream tasks. 
+Here is an example excerpt from the Makefile in the downstream \texttt{LODES\_commuting\_analysis} task.
+It first produces a symbolic link to the contents of \texttt{initialdata/output}
+and then runs a Stata script that employs this input.
+\begin{lstlisting}[language=make]
+../input/mi_od_main_JT01_2010.csv: | ../input/
+	if [ -e ../../initialdata/output/$(@F) ] ; then ln -s ../../initialdata/output/$(@F) $@ ; else exit 1; fi
+../output/Wayne_MI_2010_2014_tabulatezeros.tex: sparsity_similarity.do ../input/mi_od_main_JT01_2010.csv ../input/mi_od_main_JT01_2014.csv
+	if command -v sbatch > /dev/null ; then sbatch -W --export=command1='module load stata',command2='stata-se -e sparsity_similarity.do' run.sbatch; else stata-se -e sparsity_similarity.do; fi 	
+\end{lstlisting}
+The first recipe checks if the upstream input exists and creates a symbolic link called \texttt{../input/mi\_od\_main\_JT01\_2010.csv} that points to the upstream task output.
+If that upstream output file does not exist, the recipe exits.
+That is, \texttt{-e} returns true if the target exists and \texttt{ln -s} creates a symbolic link.  
+The last two lines run a Stata do-file in order to produce the target \texttt{../output/Wayne\_MI\_2010\_2014\_tabulatezeros.tex}.
+That target has three pre-requisites: \texttt{sparsity\_similarity.do} and two CSV files in \texttt{input} folder.
+The command \texttt{if command -v sbatch > /dev/null } evaluates to true if \texttt{sbatch} is a valid command.
+If false, we run \texttt{stata-se} from the command line instead of submitting a Slurm job.
