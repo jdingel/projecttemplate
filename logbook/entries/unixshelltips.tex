@@ -12,8 +12,15 @@ You will therefore run into annoying differences when trying to use some utiliti
 Here's a short list:
 \begin{itemize}
 \item \texttt{tree} not available in OS X
-\item \texttt{cut } lacks the complement option in OS X
-\item \texttt{sed -i} option syntax \href{https://stackoverflow.com/questions/2320564/i-need-my-sed-i-command-for-in-place-editing-to-work-with-both-gnu-sed-and-bsd}{differs} between Linux and OS X
+\item \texttt{cut} lacks the complement option in OS X
+\item Unfortunately, \texttt{sed} differs considerably between GNU and OS X.
+\begin{itemize}
+	\item The \texttt{-i} option syntax \href{https://stackoverflow.com/questions/2320564/i-need-my-sed-i-command-for-in-place-editing-to-work-with-both-gnu-sed-and-bsd}{differs} between GNU and OS X
+	\item GNU sed \href{https://unix.stackexchange.com/questions/13711/differences-between-sed-on-mac-osx-and-other-standard-sed}{supports} \texttt{\textbackslash|}, \texttt{\textbackslash+}, and \texttt{\textbackslash?} in regular expressions but OS X (and POSIX) don't.
+	\item Other warnings (\href{https://unix.stackexchange.com/a/131940}{1},\href{https://stackoverflow.com/questions/1227174/sed-on-os-x-cant-seem-to-use-in-regexps}{2}), like the \texttt{-e} flag will give you extended regular expressions in OS X but isn't really compatible with Linux.
+\end{itemize}
+
+
 \end{itemize}
 
 
@@ -134,6 +141,14 @@ This \href{https://slurm.schedmd.com/pdfs/summary.pdf}{two-page PDF} lists almos
 	\end{lstlisting}
 	Without options, \texttt{rcchelp usage --byjob} provides a complete history of job submissions.
 	Piping it to grep to select only lines containing a number in the form \#\#\#.\#\# returns only jobs that used at least 100 service units.
+\end{itemize}
+
+\subsection{Jumping between MacOS GUI and Terminal}
+
+A few tips if you're using Terminal on your Mac but not a 100\% command-line ninja:
+\begin{itemize}
+	\item You can drag the path of a Mac folder into Terminal (or Stata) by dragging the folder icon at the top of its Finder window into the Terminal prompt (\href{https://twitter.com/lukestein/status/1179792864630296578}{via Luke Stein})
+	\item Typing \texttt{`open . `} in any directory in the Terminal will open that folder in the Finder (\href{https://twitter.com/FlorianOswald/status/1179779138892292096}{via Florian Oswald})
 \end{itemize}
 
 \subsection{Other resources}
