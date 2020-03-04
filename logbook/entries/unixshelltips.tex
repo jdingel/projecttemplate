@@ -131,7 +131,7 @@ This \href{https://slurm.schedmd.com/pdfs/summary.pdf}{two-page PDF} lists almos
 	\item \texttt{squeue --user=jdingel}: list running and queued jobs for the relevant users
 	\item My preferred \texttt{squeue} command is the following:
 	\begin{lstlisting}[language=bash]
-	squeue --user=jdingel  --format="\%.17i \%.13P \%.20j \%.8u \%.8T \%.9M \%.9l \%.6D \%R" #jdjobs
+	squeue --user=jdingel  --format="%.17i %.13P %.20j %.8u %.8T %.9M %.9l %.6D %R" #jdjobs
 	\end{lstlisting}
 	This provides a good bit more information about each job.
 	\item \texttt{rcchelp sinfo}: produce a summary of the partitions on Midway
