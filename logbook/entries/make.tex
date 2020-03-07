@@ -62,6 +62,17 @@ A note on running Makefiles in a cluster computing environment that has a job sc
 	\item Read \url{http://wresch.github.io/2012/11/01/qsub-submit-jobs-from-makefile.html} for more discussion of \texttt{qsub} and the \texttt{sbatch} \href{https://slurm.schedmd.com/sbatch.html}{manual} for discussion of \texttt{-W} or \texttt{--wait}. 
 \end{itemize}
 
+
+The following options are often relevant:
+\begin{itemize}
+	\item \texttt{-n}: Prints the recipes that would be executed without executing them. Great to preview what jobs you're going to launch by running Make.
+	\item \texttt{-j}: this option allows parallelization of jobs, i.e., contemporaneous execution of several recepies.
+	Normally, make executes one recipe at a time, but \texttt{-j} enables simultaneous execution.
+	\texttt{-j} is followed by an integer specifying the number of parallel processes.
+	The default number of jobs run is 1 (serial processing).
+	\item \texttt{--debug}: this option is useful to know how make analyzes your dependency graph. This option provides the most detailed information available other than running a debugger. We make use of 2 suboptions of --debug: ``basic'' and ``verbose''. When the ``basic'' suboption is used, make will print each target that is found out-of-date and the status of the update action. ``verbose'' replicates the ``basic'' suboption and includes additional information about files that were parsed, prerequisites that did not need to be rebuilt, etc. 
+\end{itemize}
+
 \subsection{Some simple examples of Makefiles}
 Here is an example of what a Makefile in an ``initialdata" task folder might do.
 The following code is an excerpt from a Makefile that downloads Census data and produces a CSV by unzipping the downloaded file.
