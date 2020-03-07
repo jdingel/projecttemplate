@@ -1,0 +1,17 @@
+Before distributing a draft, use automated tools to validate the text.
+Within \texttt{paper/reviewing}, there is a Makefile that
+\begin{itemize}
+	\item reports repeated words to avoid ``the the'' errors
+	\item changes references to be ``tight'': \texttt{Table$\scriptstyle\sim$\textbackslash{}ref} rather than \texttt{Table \textbackslash{}ref}
+	\item prints hard-coded numbers for verification or replacement
+	\item runs ChkTeX to check \LaTeX semantics
+	\item runs TeXtidote to check grammar and spelling
+\end{itemize}
+
+\begin{itemize}
+\item 
+If you haven't installed \href{https://ctan.org/pkg/chktex?lang=en}{ChkTeX}, Macintosh installation instrutions are available at \url{http://www2.hawaii.edu/~ramonf/ChkTeXonMacOSX/index.html}.
+\item
+TeXtidote is available from \url{https://github.com/sylvainhalle/textidote}.
+To install on Mac OS X, install the \href{https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html}{JDK}.
+\end{itemize}
