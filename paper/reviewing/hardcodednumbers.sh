@@ -4,7 +4,8 @@
 for file in $(find ../sections -name '*.tex')
 do
 	echo '===' ${file} '==='
-	gawk -f removeequations.awk ${file} |
+	cat ${file} | 
+	sed '/begin{equation}/,/end{equation}/d' | sed '/begin{equation\*}/,/end{equation\*}/d' | sed '/begin{align}/,/end{align}/d' | sed '/begin{align\*}/,/end{align\*}/d' | #Remove equation environments
 	sed 's/\\input{[A-Za-z0-9_\/\.]*}//g' | # Drop input files that might contain numbers
 	grep -v 'includegraphics' | #Drop lines that are graphics filepaths or numbers setting the figure size
 	sed 's/[0-9\.]*\\textwidth//g' |
