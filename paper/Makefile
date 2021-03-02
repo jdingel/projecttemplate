@@ -3,8 +3,8 @@
 FOLDERS = input
 PAPER_SECTIONS = $(shell grep '\\input' paper.tex  | grep -v '%.*\\input' | sed 's/^.*\\input{\(.*\.tex\)}.*/\1/')
 #These two lines are commented out because paper.tex lacks content at the moment:
-#PAPER_INPUTS_TEX = $(shell $(PAPER_SECTIONS) | xargs grep '\\input' | grep -v '%.*\\input' | sed 's/^.*\\input{\(.*\.tex\)}.*/\1/')
-#PAPER_INPUTS_IMG = $(shell $(PAPER_SECTIONS) | xargs grep '\\includegraphics' | grep -v '%.*\\includegraphics' | sed 's/^.*\\includegraphics\[.*\]{\(.*\)}.*/\1/')
+#PAPER_INPUTS_TEX = $(shell grep '\\input{' $(PAPER_SECTIONS) | grep -v '%.*\\input' | sed 's/^.*\\input{\(.*\.tex\)}.*/\1/')
+#PAPER_INPUTS_IMG = $(shell grep --no-filename '\\includegraphics' $(PAPER_SECTIONS) | grep -v '%.*\\includegraphics' | sed 's/^.*\\includegraphics\[.*\]{\(.*\)}.*/\1/')
 
 ## RECIPES
 

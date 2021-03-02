@@ -3,13 +3,14 @@ If an upstream task changes, downstream tasks ought to be re-run using that new 
 This is easy to do by hand when your project has a small number of tasks.
 This is hard to do when the tasks are computationally intensive and the input-output graph is complicated.
 Thankfully, computer programmers addressed these difficulties long ago with a Unix utility called \href{https://en.wikipedia.org/wiki/Make_(software)}{Make}.
+This is a popular form of the broader concept of \href{https://tradediversion.net/2019/11/06/why-your-research-project-needs-build-automation/}{build automation}.
 
 Makefiles are machine-readable documentation that make your workflow reproducible.
 They follow naturally from our task-based approach.
 Downstream tasks depend on upstream tasks.
 Using \texttt{make} requires you to specify those input-output relationship (dependencies).
 When generated files are missing, or when files they depend on have changed, needed files are re-made using a sequence of commands you specify.
-The commands are language-agnostic: if you can type it at the shell prompt, 
+The commands are language-agnostic: if you can type it at the shell prompt,
 \texttt{make} can execute it.
 
 \subsection{Learn Make}
@@ -23,6 +24,8 @@ Here are four introductions to \texttt{make}, listed in the order that I suggest
 \item Zachary M. Jones: \href{http://zmjones.com/make/}{GNU Make for Reproducible Data Analysis}
 \end{itemize}
 
+The \href{https://www.youtube.com/watch?v=_Ms1Z4xfqv4}{first fifteen minutes of Lecture 8} in MIT's ``Missing Semester'' CS class are a nice introduction to Make.
+
 \subsection{Notes on writing Makefiles}
 
 The \texttt{Makefile} in the \texttt{logbook} folder is a simple example.
@@ -33,22 +36,31 @@ See \href{https://www.gnu.org/software/make/manual/html_node/Recipe-Syntax.html}
 
 A few notes on Makefile style.
 \begin{itemize}
-\item It is helpful to define \href{https://www.gnu.org/software/make/manual/html_node/Variables-Simplify.html#Variables-Simplify}{variables} containing long lists of files, such as \texttt{inputs= file1 file2 file3}
-so that you can summarize dependencies simply by writing \texttt{\$(inputs)}
-and define targets simply by writing \texttt{all: \$(inputs) \$(outputs)}.
+\item It is helpful to define \href{https://www.gnu.org/software/make/manual/html_node/Variables-Simplify.html#Variables-Simplify}{variables} containing long lists of files, such as \texttt{INPUTS= file1 file2 file3}
+so that you can summarize dependencies simply by writing \texttt{\$(INPUTS)}
+and define targets simply by writing \texttt{all: \$(INPUTS) \$(OUTPUTS)}.
 However, it is only sensible to write a target-dependency relationship as
-\texttt{\$(outputs): \$(inputs)}
+\texttt{\$(OUTPUTS): \$(INPUTS)}
 if there is one recipe that produces all those outputs jointly.
 \item Writing separate recipes for separate targets is advantageous because Make will return more informative errors by telling you which recipe failed.
 For example, instead of having a script \texttt{create\_symlinks.sh} that tries to produce the symbolic links for every input file,
 you can write a recipe for every symbolic link in which the symbolic link in the task's \texttt{input} folder is a target.
 When one of those symbolic links fails to be created, Make will tell you which symbolic link didn't work, making it easier to identify the problematic/missing input upstream.
-\item \href{https://www.gnu.org/software/make/manual/html_node/Automatic-Variables.html}{Automatic variables} take values computed when the rule is executed based on the target and pre-requisites of the rule. 
-Commonly used automatic variables include 
+\item \href{https://www.gnu.org/software/make/manual/html_node/Automatic-Variables.html}{Automatic variables} take values computed when the rule is executed based on the target and pre-requisites of the rule.
+Commonly used automatic variables include
 the file name of the target of the rule \texttt{\$@},
 the name of the first pre-requisite \texttt{\$<},
 and
 the file-within-directory part of the file name of the target \texttt{\$(@F)}.
+\item In addition to normal prerequisites, it might be helpful to define \href{https://www.gnu.org/software/make/manual/html_node/Prerequisite-Types.html}{order-only prerequisites}.
+Order-only prerequisites must exist in order for the target to be produced, but the target does not need to be newer than the order-only prerequisites.
+An example of prerequisites that should be regarded as order-only is folders, since ``the timestamps on directories change whenever a file is added, removed, or renamed, we certainly don’t want to rebuild all the targets whenever the directory’s timestamp changes'' (\href{https://www.gnu.org/software/make/manual/html_node/Prerequisite-Types.html}{GNU}). 
+Order-only prerequisites are defined by listing them after the pipe symbol: \texttt{output: normal prerequisites | order-only prerequisites}.
+\item Make provides several built-in \href{https://www.gnu.org/software/make/manual/html_node/Functions.html\#Functions}{functions for transforming text}.
+Commonly used functions include \texttt{foreach} for performing text substitution by looping
+and \texttt{addprefix} for prepending prefix in front of individual names.
+\item In addition to executing recipes in the shell, you can define Make variables using shell commands by invoking Make's \texttt{shell} command.
+The simplest example would \texttt{\$(shell echo \{1..10\})}, which would return the integers from 1 to 10 via Bash's \href{https://www.shell-tips.com/bash/seq-brace-expansion/}{brace expansion}.
 
 \end{itemize}
 
@@ -59,7 +71,7 @@ A note on running Makefiles in a cluster computing environment that has a job sc
 	\item You need the job submission command to not exit back to the shell until the job completes, so that the target will be produced before Make evaluates that recipe's success or failure.
 	\item With \texttt{qsub} at Census RDC, use \texttt{qsub -W block=true}.
 	\item With \texttt{sbatch} at Chicago Midway, use \texttt{sbatch -W}.
-	\item Read \url{http://wresch.github.io/2012/11/01/qsub-submit-jobs-from-makefile.html} for more discussion of \texttt{qsub} and the \texttt{sbatch} \href{https://slurm.schedmd.com/sbatch.html}{manual} for discussion of \texttt{-W} or \texttt{--wait}. 
+	\item Read \url{http://wresch.github.io/2012/11/01/qsub-submit-jobs-from-makefile.html} for more discussion of \texttt{qsub} and the \texttt{sbatch} \href{https://slurm.schedmd.com/sbatch.html}{manual} for discussion of \texttt{-W} or \texttt{--wait}.
 \end{itemize}
 
 
@@ -70,7 +82,10 @@ The following options are often relevant:
 	Normally, make executes one recipe at a time, but \texttt{-j} enables simultaneous execution.
 	\texttt{-j} is followed by an integer specifying the number of parallel processes.
 	The default number of jobs run is 1 (serial processing).
-	\item \texttt{--debug}: this option is useful to know how make analyzes your dependency graph. This option provides the most detailed information available other than running a debugger. We make use of 2 suboptions of --debug: ``basic'' and ``verbose''. When the ``basic'' suboption is used, make will print each target that is found out-of-date and the status of the update action. ``verbose'' replicates the ``basic'' suboption and includes additional information about files that were parsed, prerequisites that did not need to be rebuilt, etc. 
+	\item \texttt{--debug}: this option is useful to know how make analyzes your dependency graph. This option provides the most detailed information available other than running a debugger.
+	We make use of 2 suboptions of \texttt{--debug}: ``basic'' and ``verbose''.
+	When the ``basic'' suboption is used, make will print each target that is found out-of-date and the status of the update action.
+	``verbose'' replicates the ``basic'' suboption and includes additional information about files that were parsed, prerequisites that did not need to be rebuilt, etc.
 \end{itemize}
 
 \subsection{Some simple examples of Makefiles}
@@ -82,9 +97,9 @@ The following code is an excerpt from a Makefile that downloads Census data and 
 ../output/mi_od_main_JT01_2010.csv: ../output/mi_od_main_JT01_2010.csv.gz
 	gunzip -c $< > $@
 \end{lstlisting}
-For the first two lines above, \texttt{wget} is a free utility for non-interactive download of files from the web and \texttt{-O} is an option that concatenate all documents together and writes to the specified output file. 
+For the first two lines above, \texttt{wget} is a free utility for non-interactive download of files from the web and \texttt{-O} is an option that concatenate all documents together and writes to the specified output file.
 The automatic variable \texttt{\$(@F)} equals \texttt{mi\_od\_main\_JT01\_2010.csv.gz},
-the file-within-directory part of the file name of the target. 
+the file-within-directory part of the file name of the target.
 It is used in specify the web address of the Census file.
 Note that \texttt{../output/} is an (order-only) pre-requisite of this target.
 If that directory does not exist, the Makefile must provide a recipe to create it.
@@ -92,17 +107,17 @@ If that directory does not exist, the Makefile must provide a recipe to create i
 The second rule concerns the target \texttt{../output/mi\_od\_main\_JT01\_2010.csv}.
 If the target  does not exist or if the target is older than (any of) the pre-requisite(s) listed after the colon,
 then the recipe for that target is executed.
-\href{https://linux.die.net/man/1/gunzip}{\texttt{gunzip}} takes a list of files on its command line and replaces each file whose name ends with .gz, -gz, .z, -z, \_z or .Z and which begins with the correct magic number with an uncompressed file without the original extension. 
-\texttt{-c} is an option that writes output on standard output and keeps original files unchanged. 
+\href{https://linux.die.net/man/1/gunzip}{\texttt{gunzip}} takes a list of files on its command line and replaces each file whose name ends with .gz, -gz, .z, -z, \_z or .Z and which begins with the correct magic number with an uncompressed file without the original extension.
+\texttt{-c} is an option that writes output on standard output and keeps original files unchanged.
 \texttt{\$<} is the name of the first pre-requisite, \texttt{../output/mi\_od\_main\_JT01\_2010.csv.gz} and \texttt{\$@} is the file name of the target, \texttt{../output/mi\_od\_main\_JT01\_2010.csv}.
-\texttt{>} redirects output to a file, overwriting the file. 
-(By the way, \texttt{>>} appends redirected output to the end of a file (rather than overwriting).) 
+\texttt{>} redirects output to a file, overwriting the file.
+(By the way, \texttt{>>} appends redirected output to the end of a file (rather than overwriting).)
 Therefore, the fourth line in the example above uncompresses the pre-requisite and writes the output to the target.
 
-If you type \texttt{make ../output/mi\_od\_main\_JT01\_2010.csv} at the command line, \texttt{make} will try to make the CSV target and see the CSV.GZ file as a pre-requisite. 
+If you type \texttt{make ../output/mi\_od\_main\_JT01\_2010.csv} at the command line, \texttt{make} will try to make the CSV target and see the CSV.GZ file as a pre-requisite.
 If the pre-requisite has not been already downloaded, \texttt{make} will first run the recipe to produce that CSV.GZ file (the \texttt{wget} command) and then execute the recipe to produce the target.
 
-After obtaining the initial data, we will likely use these data in multiple downstream tasks. 
+After obtaining the initial data, we will likely use these data in multiple downstream tasks.
 Here is an example excerpt from the Makefile in the downstream \texttt{LODES\_commuting\_analysis} task.
 It first produces a symbolic link to the contents of \texttt{initialdata/output}
 and then runs a Stata script that employs this input.
@@ -110,11 +125,11 @@ and then runs a Stata script that employs this input.
 ../input/mi_od_main_JT01_2010.csv: | ../input/
 	if [ -e ../../initialdata/output/$(@F) ] ; then ln -s ../../initialdata/output/$(@F) $@ ; else exit 1; fi
 ../output/Wayne_MI_2010_2014_tabulatezeros.tex: sparsity_similarity.do ../input/mi_od_main_JT01_2010.csv ../input/mi_od_main_JT01_2014.csv
-	if command -v sbatch > /dev/null ; then sbatch -W --export=command1='module load stata',command2='stata-se -e sparsity_similarity.do' run.sbatch; else stata-se -e sparsity_similarity.do; fi 	
+	if command -v sbatch > /dev/null ; then sbatch -W --export=command1='module load stata',command2='stata-se -e sparsity_similarity.do' run.sbatch; else stata-se -e sparsity_similarity.do; fi
 \end{lstlisting}
 The first recipe checks if the upstream input exists and creates a symbolic link called \texttt{../input/mi\_od\_main\_JT01\_2010.csv} that points to the upstream task output.
 If that upstream output file does not exist, the recipe exits.
-That is, \texttt{-e} returns true if the target exists and \texttt{ln -s} creates a symbolic link.  
+That is, \texttt{-e} returns true if the target exists and \texttt{ln -s} creates a symbolic link.
 The last two lines run a Stata do-file in order to produce the target \texttt{../output/Wayne\_MI\_2010\_2014\_tabulatezeros.tex}.
 That target has three pre-requisites: \texttt{sparsity\_similarity.do} and two CSV files in \texttt{input} folder.
 The command \texttt{if command -v sbatch > /dev/null } evaluates to true if \texttt{sbatch} is a valid command.

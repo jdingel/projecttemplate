@@ -1,13 +1,13 @@
 \label{entry:unixshelltips}
 
-This section documents basic Unix commands and then some clever combinations for tasks we often encounter during research.
+This section documents basic Unix/Linux shell commands and then some clever combinations for tasks we often encounter during research.
 At the command line, type \texttt{man <<command>>} to get the \href{https://en.wikipedia.org/wiki/Man_page}{manual page} for \texttt{<<comand>>}.
 
 \subsection{Mac OS X is Unix and POSIX-compliant, not GNU/Linux}
 
 Mac OS X is based on the Darwin operating system, which is based on BSD.
 It \href{https://www.opengroup.org/openbrand/register/apple.htm}{counts as UNIX} and is POSIX-compliant.
-But it is not GNU/Linux. 
+But it is not GNU/Linux.
 You will therefore run into annoying differences when trying to use some utilities, mostly when you see a solution on StackExchange that works on GNU/Linux but doesn't work on Mac OS X.
 Here's a short list:
 \begin{itemize}
@@ -30,7 +30,9 @@ Here's a short list:
 	\item \texttt{pwd}: identify the ``present working directory''
 	\item \texttt{cd}: ``change directory'' to the named destination (e.g., \texttt{cd <<destination>>})
 	\item \texttt{ls -lht}: lists the current directory's contents. The \texttt{-lht} options list the files in detail, with human-readable file sizes, ordered by time last modified.
-	\item \href{https://en.wikipedia.org/wiki/Command-line_completion}{tab completion}: You do not have to type a complete filename. Starting typing the file name and hit the \texttt{tab} key. Commands with long or difficult to spell filenames can be entered by typing the first few characters and pressing a completion key, which completes the command or filename.
+	\item \href{https://en.wikipedia.org/wiki/Command-line_completion}{tab completion}:
+	You do not have to type a complete filename. Starting typing the file name and hit the \texttt{tab} key.
+	Commands with long or difficult to spell filenames can be entered by typing the first few characters and pressing a completion key, which completes the command or filename.
 	\item To recall a command from your \href{https://www.howtogeek.com/howto/44997/how-to-use-bash-history-to-improve-your-command-line-productivity/}{history}, type \texttt{ctrl-R} to search and type a fragment of the command
 	\item hashtag comments: comments in the shell are set off by \texttt{\#}. add a comment to your command to tag it for easier retrieval via search in the future
 	\item copy files using \texttt{cp}, move files using \texttt{mv}
@@ -56,7 +58,7 @@ Use \texttt{>>} to append to an existing file.
 
 
 \begin{itemize}
-	\item parse a directory listing using \texttt{grep}: the command 
+	\item parse a directory listing using \texttt{grep}: the command
 	\begin{verbatim}ls -l | grep 'key'\end{verbatim}
 	will output the directory listing and select only the lines containing the phrase ``key''
 	\item write hello world to a file:
@@ -80,6 +82,7 @@ Use \texttt{>>} to append to an existing file.
 		\item how to \href{https://stackoverflow.com/questions/29465612/how-to-detect-invalid-utf8-unicode-binary-in-a-text-file}{detect invalid utf8} unicode/binary in a text file: \texttt{grep -axv '.*' file.txt}
 	\end{itemize}
 	\item \texttt{sed}: stream editor with many functions; I mostly use it to substitute one expression for another
+	\item \texttt{tr}: change or delete characters. It is useful for changing filenames (e.g. deleting whitespace).
 	\item \texttt{awk}: find and replace text, print columns, a number of other text editing functions
 	\begin{itemize}
 		\item \href{https://developer.ibm.com/tutorials/l-awk1/}{An intro to the great language with the strange name} (Daniel Robbins, 1 Dec 2000)
@@ -88,7 +91,7 @@ Use \texttt{>>} to append to an existing file.
 	\item \texttt{paste}: horizontally concatenate files with equal number of lines
 \end{itemize}
 
-Combine these well and you get something like 
+Combine these well and you get something like
 ``\href{https://adamdrake.com/command-line-tools-can-be-235x-faster-than-your-hadoop-cluster.html}{Command-line Tools can be 235x Faster than your Hadoop Cluster}''.
 
 \subsection{Emacs}
@@ -107,7 +110,7 @@ With regard to Emacs \href{https://www.emacswiki.org/emacs/EmacsKeyNotation}{key
 \begin{itemize}
 	\item Quitting/exiting: \texttt{C-x C-c}
 	\item Saving: \texttt{C-x C-s}
-	\item \href{https://www.emacswiki.org/emacs/CopyAndPaste}{Copy and paste}: 
+	\item \href{https://www.emacswiki.org/emacs/CopyAndPaste}{Copy and paste}:
 	The selected region is where your cursor is relative to where you set a mark.
 	Set a mark with C-space.
 	Then move your cursor to end of region and hit C-w to cut (kill) or M-w to copy.
@@ -120,13 +123,36 @@ With regard to Emacs \href{https://www.emacswiki.org/emacs/EmacsKeyNotation}{key
 \href{https://www.gnu.org/software/screen/manual/}{Screen} is ``a full-screen window manager that multiplexes a physical terminal between several processes, typically interactive shells.''
 Consider using this if you want, e.g., to run Stata interactively in the bottom half of your screen while working on your do file in a text editor in the top half.
 
-\subsection{Slurm (Simple Linux Utility for Resource Management)}
+\subsection{Data compression}
+In macOS, using the Finder to compress files produces hidden files that are useless to non-Mac users.%
+\footnote{For details, see \url{https://perishablepress.com/remove-macosx-ds-store-zip-files-mac/}.}
+In addition, the Finder does not use the ZIP64 extension to compress files what may make large ZIP files unreadable by other machines.
+To avoid these issues, compress data by using the Terminal command line instead of the Finder.
+The following Unix utilities are available to compress or decompress data:
+\begin{itemize}
+	\item \texttt{tar} for tar archive format
+	\item \texttt{zip} for zip archive format.
+	\item \texttt{gzip} for gz archive format.
+\end{itemize}
+
+When compresing files, it might be also useful to store the names of saved file without storing the directories.
+In zip utility, it can be done using option \texttt{-j} to junk the paths.
+
+
+\subsection{SLURM (Simple Linux Utility for Resource Management)}
 
 Read the \href{https://rcc.uchicago.edu/docs/using-midway/index.html#batch-jobs}{RCC introduction} and then head over to the \href{https://slurm.schedmd.com/overview.html}{official documentation}.
+To understand how the RCC compute ecosystem and get futher information on RCC usage, read \href{https://github.com/rcc-uchicago/SLURM_Workshop_2020/blob/main/Slides/Running_Jobs_at_RCC_fall.pdf}{slides from UChicago Slurm workshop.}
 This \href{https://slurm.schedmd.com/pdfs/summary.pdf}{two-page PDF} lists almost all the relevant commands you might need.
 
 \begin{itemize}
 	\item \texttt{sbatch}: this command submits jobs (\texttt{.sbatch} scripts) to the job scheduler on the cluster
+	\begin{itemize}
+		\item Instead of writing a separate sbatch file for each script you might want to run using SLURM, you can pass the particular script/filename as an argument using the \texttt{--export} option.
+		\item It is possible to set job dependencies in Slurm: 
+		Slurm will not start a job until the specified dependecies are satified.
+		To set job dependencies, specify the dependency type and job ID in \texttt{--dependency} option.
+	\end{itemize}
 	\item \texttt{sinteractive}: start an interactive session on the server
 	\item \texttt{squeue --user=jdingel}: list running and queued jobs for the relevant users
 	\item My preferred \texttt{squeue} command is the following:
@@ -135,7 +161,7 @@ This \href{https://slurm.schedmd.com/pdfs/summary.pdf}{two-page PDF} lists almos
 	\end{lstlisting}
 	This provides a good bit more information about each job.
 	\item \texttt{rcchelp sinfo}: produce a summary of the partitions on Midway
-	\item How to only see really costly jobs: 
+	\item How to only see really costly jobs:
 	\begin{lstlisting}[language=bash]
 	rcchelp usage --byjob | grep '[0-9][0-9][0-9]\.[0-9][0-9][[:blank:]]|'
 	\end{lstlisting}

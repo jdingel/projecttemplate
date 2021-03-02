@@ -29,19 +29,19 @@ Binaries (like PDFs) are less suitable, since you can't examine their contents.
 Obviously all code should be in version control. What about writing?
 \begin{itemize}
 	\item \LaTeX\ is perfect; it's plaintext.
-	\item LyX is suitable for version control, because \texttt{.lyx} files are plaintext. 
+	\item LyX is suitable for version control, because \texttt{.lyx} files are plaintext.
 	\item Jonathan prefers to err on the side of documenting and committing too much. There's little downside.
 \end{itemize}
 
 A file called \texttt{.gitignore} identifies paths that should not be tracked by Git.
 \begin{itemize}
-\item 
+\item
 We don't commit data.
 I therefore typically put \texttt{tasks/*/output} in \texttt{.gitignore} so that the repository doesn't track output files.
 \item
 Git sees symbolic links as their targets.
 I therefore put \texttt{tasks/*/input} in \texttt{.gitignore} so that the repository doesn't track data files.
-\item 
+\item
 To produce logbook content (and the paper), you may want to commit tables and figures from these output folders.
 To do so, you can always type, for example, \texttt{git add table1.tex -f}, where the \texttt{-f} force option causes the file to be tracked despite the gitignore rule.
 \end{itemize}
@@ -53,7 +53,7 @@ To productively use git in a single-machine environment, you only need to know a
 \item \texttt{git init} initializes a repository in the current working directory
 \item \texttt{git status} tells you what files have been modified since you last committed
 \item \texttt{git diff} shows you those modifications (and can also show you the modifications between any two commits)
-\item \texttt{git add} stages a file 
+\item \texttt{git add} stages a file
 \item \texttt{git commit} commits a set of changes
 \item \texttt{git log} lists the history of commits
 \end{itemize}
@@ -73,9 +73,9 @@ Some notes on command-line Git by Ningyin Xu, a former RA, follow.
 
 \subsubsection{Setting up a repository}
 
-If you want to create a brand-new repo, you'll use the \texttt{git init} command. 
+If you want to create a brand-new repo, you'll use the \texttt{git init} command.
 \begin{lstlisting}[language=bash]
-cd /path/to/your/existing/project 
+cd /path/to/your/existing/project
 git init
 \end{lstlisting}
 
@@ -83,7 +83,7 @@ git init
 Now that we have a repository, we can edit its contents and then commit changes to it.
 The basic commands are:
 \begin{lstlisting}[language=bash]
-cd /path/to/repo 
+cd /path/to/repo
 # make some changes to a file named "test.txt"
 git add test.txt
 git commit -m "edited test.txt"
@@ -97,15 +97,15 @@ Committed snapshots can be thought of as ``saved'' versions of a project, Git wi
 In conjunction with these commands, you'll also need \texttt{git status} to view the state of the working directory and the staging area.
 In general cases, you could do ``git status'' before ``git add'', and Git will tell you what files you have made changes and how you could deal with them.
 
-Another common use case for \texttt{git add} is the \texttt{--all} option. 
+Another common use case for \texttt{git add} is the \texttt{--all} option.
 Executing \texttt{git add --all} will take any changed and untracked files in the repo and
 add them to the repo and update the repo's working tree.
-This may include hidden files. 
+This may include hidden files.
 You should list files that you do not want to be part of the repository in the file called \texttt{.gitignore} (\href{https://git-scm.com/docs/gitignore}{documentation}).
 
 
 \subsubsection{Undoing changes}
-The \texttt{git checkout} command is mostly used for its three functions: 
+The \texttt{git checkout} command is mostly used for its three functions:
 checking out files, checking out commits, and checking out branches.
 Checking out a commit makes the entire working directory match that commit.
 This can be used to view an old state of your project without altering your current state in any way.
@@ -114,16 +114,21 @@ Checking out branches will be discussed in the \textbf{Collaboration} section.
 \\
 \begin{lstlisting}[language=bash]
 git checkout <commit> <file>
-# Check out a previous version of a file. This turns the <file> that resides 
-# in the working directory into an exact copy of the one from <commit> and 
+# Check out a previous version of a file. This turns the <file> that resides
+# in the working directory into an exact copy of the one from <commit> and
 # adds it to the staging area.
 
 git checkout <commit>
-# Update all files in the working directory to match the specified commit. 
-# But this is a read-only operation, the ``current'' state of your project 
+# Update all files in the working directory to match the specified commit.
+# But this is a read-only operation, the ``current'' state of your project
 # remains untouched in the master branch.
 
 git checkout master
 # This lets you to get back to the "current" state (under the condition you
 # don't have more than one branches).
 \end{lstlisting}
+
+In some case, you might want to undo your last commit.
+To do that, use \texttt{git reset --soft HEAD\texttt{$\sim$}1}.
+This command will remove the last commit from the current branch and keep previously commited files in the staged area.
+For a more detailed description, see \href{https://www.atlassian.com/git/tutorials/undoing-changes/git-reset}{Atlassian guide}.
