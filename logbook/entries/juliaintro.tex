@@ -1,28 +1,67 @@
 Jonathan prefers Julia to Matlab.
+
+\subsubsection{Julia resources}
 Jonathan learned Julia by starting with the \href{https://lectures.quantecon.org/jl/index_learning_julia.html}{QuantEcon introduction to Julia}.
 
 Here are some helpful resources:
 \begin{enumerate}
-\item \url{https://julialang.org/}: for installation and general info about julia: blogs, publications, conference
-\item \url{https://docs.julialang.org/en/stable/manual/introduction/}: excellent manual for julia
-\item \url{https://lectures.quantecon.org/jl/}: also an excellent manual for Julia with a macro vibe
-\item \url{https://github.com/bkamins/Julia-DataFrames-Tutorial}: excellent tutorial on how to read/use DataFrames in Julia
-\item \url{https://www.juliabloggers.com/}: to keep up with advancements in Julia
-\item \url{http://www.johnmyleswhite.com/}: for interesting discussions about performance in Julia 
+\item \href{https://julialang.org}{julialang.org}: for installation and general info about julia: blogs, publications, conference
+\item \href{https://docs.julialang.org/en/stable/manual/introduction/}{docs.julialang.org/en/stable/manual/introduction}: excellent manual for julia
+\item \href{https://lectures.quantecon.org/jl/}{lectures.quantecon.org/jl}: an excellent manual for Julia with a macro vibe
+\item \href{https://github.com/bkamins/Julia-DataFrames-Tutorial}{github.com/bkamins/Julia-DataFrames-Tutorial}: excellent tutorial on how to read/use DataFrames in Julia
+\item \href{https://www.juliabloggers.com/}{juliabloggers.com}: to keep up with advancements in Julia
+\item \href{http://www.johnmyleswhite.com/}{johnmyleswhite.com}: for interesting discussions about performance in Julia 
 \end{enumerate}
 
 List of very useful packages:
 \begin{itemize}
-\item \url{https://github.com/JuliaData/DataFrames.jl}: DataFrames in Julia
-\item \url{https://github.com/davidanthoff/ReadStat.jl}: read dta files in Julia
-\item \url{https://github.com/JuliaIO/JLD.jl}: fantastic way of storing output in Julia
-\item \url{https://github.com/JuliaNLSolvers/Optim.jl}: General optimization in julia
-\item \url{https://github.com/johnmyleswhite/Calculus.jl}: for automatic diffentiation in Julia (very practical to check your analytical expressions of gradients and hessians)
+\item \href{https://github.com/JuliaData/DataFrames.jl}{DataFrames.jl}: DataFrames in Julia
+\item \href{https://github.com/davidanthoff/ReadStat.jl}{ReadStat.jl}: read \texttt{dta} files in Julia
+\item \href{https://github.com/JuliaIO/JLD.jl}{JLD.jl}: fantastic way of storing output in Julia
+\item \href{https://github.com/JuliaNLSolvers/Optim.jl}{Optim.jl}: General optimization in julia
+\item \href{https://github.com/johnmyleswhite/Calculus.jl}{Calculus.jl}: for automatic diffentiation in Julia (very practical to check your analytical expressions of gradients and hessians)
 \end{itemize}
 
-Notes on using Julia on UChicago's Midway computing cluster:
+\subsubsection{Notes on using Julia on UChicago's Midway computing cluster}
 \begin{itemize}
-	\item You cannot connect to the external internet from Midway's compute nodes. 
-	Julia's packages are pulled from Github, so you must install packages in Julia (and in Stata) when running on a login node.
-	\item You can \texttt{Pkg.activate(".")} on a compute node, but you cannot \texttt{Pkg.instantiate()} on a compute node. You need to install packages, define the \texttt{Project.toml}, \texttt{Pkg.instantiate()} and precompile (\texttt{using} commands once) on a login node before moving to the compute nodes.  
+\item
+You cannot connect to the external internet from Midway's compute nodes. 
+Julia's packages are pulled from Github, so you must install packages in Julia (and in Stata) when running on a login node.
+\item
+You can \texttt{Pkg.activate(".")} on a compute node, but you cannot \texttt{Pkg.instantiate()} on a compute node.
+You need to install packages, define the \texttt{Project.toml}, \texttt{Pkg.instantiate()} and precompile (\texttt{using} commands once) on a login node before moving to the compute nodes.  
+\end{itemize}
+
+\subsubsection{Notes on managing package dependencies in Julia code}
+Running Julia code will involve packages.
+Here's how we manage them in our repositories.
+\begin{itemize}
+\item \href{https://julialang.github.io/Pkg.jl/v1/toml-files/}{\texttt{Project.toml} and \texttt{Manifest.toml}}
+\begin{itemize}
+	\item These two files are central to \texttt{Pkg}, Julia's builtin package manager.
+	They make it possible to instantiate the exact same package environment on different machines.
+	\item \texttt{Project.toml} describes the project on a high level. The package dependencies and compatibility constraints are listed in the project file.
+	\item \texttt{Manifest.toml} is an absolute record of the state of the packages in the environment. This is not pleasant to read.
+\end{itemize}
+\item In each repository, we create a task called \texttt{setup\_environment} that defines all package dependencies using the \texttt{Project.toml} and \texttt{Manifest.toml} files.
+\item In a Julia script, we set the active environment using the following commands:
+\begin{lstlisting}
+import Pkg
+Pkg.activate("../input/Project.toml")
+using package_name
+\end{lstlisting}
+While we only explicitly name \texttt{Project.toml} as an input in this script,
+this presumes that the corresponding \texttt{Manifest.toml} file is available in the same directory.
+\item In each Makefile that executes a Julia script,
+we provide these \texttt{toml} files as inputs by creating symbolic links to \texttt{setup\_environment}:
+\begin{lstlisting}[language=make]
+../input/Project.toml: ../../setup_environment/output/Project.toml | ../input/Manifest.toml ../input
+	ln -s $< $@
+../input/Manifest.toml: ../../setup_environment/output/Manifest.toml | ../input
+	ln -s $< $@
+\end{lstlisting}
+Note that we define \texttt{Manifest.toml} as a pre-requisite for \texttt{Project.toml}.
+If a list of pre-requisities is generated by parsing the Julia script for all files that start with \texttt{../input/},
+only \texttt{Project.toml} will be flagged.
+Making \texttt{Manifest.toml} a pre-requisite of \texttt{Project.toml} ensures that both files appear in the \texttt{input} folder.
 \end{itemize}

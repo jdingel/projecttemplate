@@ -11,8 +11,9 @@ But it is not GNU/Linux.
 You will therefore run into annoying differences when trying to use some utilities, mostly when you see a solution on StackExchange that works on GNU/Linux but doesn't work on Mac OS X.
 Here's a short list:
 \begin{itemize}
-\item \texttt{tree} not available in OS X
+\item \texttt{tree} not available in OS X by default, please run \texttt{brew install tree} to install it via Homebrew.
 \item \texttt{cut} lacks the complement option in OS X
+\item \texttt{wc} lacks the \texttt{-L, --max-line-length} option available in \href{https://linux.die.net/man/1/wc}{Linux}.
 \item Unfortunately, \texttt{sed} differs considerably between GNU and OS X.
 \begin{itemize}
 	\item The \texttt{-i} option syntax \href{https://stackoverflow.com/questions/2320564/i-need-my-sed-i-command-for-in-place-editing-to-work-with-both-gnu-sed-and-bsd}{differs} between GNU and OS X
