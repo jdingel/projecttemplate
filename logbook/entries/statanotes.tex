@@ -1,0 +1,43 @@
+Stata usage among older economists may just reflect path dependence.
+It has a number of shortcomings, such as no proper package mangagement.
+Beware of dumb \href{https://ifs.org.uk/docs/stata_gotchasJan2014.pdf}{Stata gotchas}.
+
+\subsubsection{Command-line execution}
+
+For old versions (before Stata 16), a few Stata commands only work in ``interactive'' mode and not when Stata is invokved at the command line.
+\begin{itemize}
+	\item \texttt{graph export}: 
+	``ps and eps are available for all versions of Stata; png and tif are available for all versions of Stata except Stata(console) for Unix; pdf is available only for Stata for Windows and Stata for Mac.''
+	See \url{https://www.stata.com/manuals13/g-2graphexport.pdf#g-2graphexport}.
+	We usually choose eps format.
+\end{itemize}
+
+
+\subsubsection{Temporary files}
+Stata loads at most one dataset at a time, 
+thus opening a dataset will cause Stata to discard the dataset that is currently in memory.
+This constraint may push you to consider saving lots of intermediate output or temporary files to the \texttt{output} folder of your task.
+Don't.
+Use Stata's \texttt{tempfile} command instead.
+
+Here is a trivial example
+\begin{lstlisting}[language=Stata]
+clear
+use "exampw1.dta", clear
+tempfile temp1    // create a temporary file
+save "`temp1'"      // save memory into the temporary file
+use "exampw2.dta", clear
+merge 1:1 v001 v002 v003 using "`temp1'" // use the temporary file
+\end{lstlisting}
+
+\subsubsection{Evaluating inequalities}
+In Stata, missing numeric observations take the value of positive infinity.
+Thus, when evaluating inequalities, $.>X$ is true for any $X$.
+I prefer using the command \texttt{inrange( )} to avoid this issue.
+Consider the following two ways of generating a dummy indicating that x1 takes a positive value:
+\begin{lstlisting}[language=Stata]
+gen byte positive1 = 1 if x1>=0
+gen byte positive2 = (inrange(x1,0,.)==1)
+\end{lstlisting}
+The first command will cause positive1 to be true if x1 is non-negative or if x1 is missing.
+By contrast, the second command will set positive2 to true only if x1 is non-negative and non-missing.

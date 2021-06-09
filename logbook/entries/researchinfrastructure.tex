@@ -9,9 +9,14 @@ It describes our research infrastructure in terms of three types of issues:
 We organize the project as a series of tasks, so our organization of code and data takes a task-based perspective.
 After writing code, we automate its execution via \texttt{make}.
 We track our code (and the rest of the project) using \texttt{Git}, a version control system.
-Collaboration occurs via Asana task assignments, BitBucket code reviews, and logbook entries that share research designs and results.
+Collaboration occurs via Asana task assignments, GitHub/BitBucket code reviews, and logbook entries that share research designs and results.
 
-Use a good text editor like \href{https://www.sublimetext.com/}{SublimeText} or \href{https://atom.io/}{Atom} to write code, slides, and papers.
+Use a good text editor like
+\href{https://www.sublimetext.com/}{SublimeText},
+\href{https://atom.io/}{Atom},
+or
+\href{https://code.visualstudio.com/}{VSCode}
+to write code, slides, and papers.
 \href{http://plain-text.co/write-and-edit.html}{Word processors aren't text editors}.
 Your text editor should, at minimum, offer you
 \href{https://en.wikipedia.org/wiki/Syntax_highlighting}{syntax highlighting},
@@ -31,4 +36,23 @@ Here are four intros to the Linux shell:
 Getting started at the command line can be a little overwhelming, but it's well worth it.
 While you can use GUI apps to interact with most of our workflow (e.g., SourceTree for version control),
 automation of some key parts relies on shell scripts.
-See logbook entry \ref{entry:unixshelltips} for an assorted collection of tips.
+See logbook entry~\ref{entry:unixshelltips} for an assorted collection of tips.
+
+Beyond *nix, the rest of the research workflow is language-agnostic:
+it applies to everything from Stata to Julia.
+In fact, the task-based approach naturally facilitates using different languages for different tasks.
+
+I have five criteria in mind when evaluating a research workflow:
+\begin{itemize}
+\item Replicability:
+Can the research results be reproduced starting from the raw data?
+\item Portability:
+If I install a fresh copy of the project on a new computer, what are the startup costs before I can run the code?
+\item Modularity:
+Can a coauthor work on a task using the provided inputs without having to look upstream at the code that produced those inputs?
+\item Dependencies:
+In the event of a data update, how do you know which pieces of code need to be run (and in what order)?
+\item History:
+If results have changed, can I discern the relevant code changes and their authors?
+\end{itemize}
+After reading the rest of this chapter, you should be able to say how our workflow answers each of these questions.
