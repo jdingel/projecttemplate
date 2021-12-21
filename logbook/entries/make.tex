@@ -29,6 +29,7 @@ Here are four written introductions to \texttt{make}, listed in the order that I
 \end{itemize}
 
 \subsection{Some simple examples of Makefiles}
+\label{some_simple_examples_of_makefiles}
 
 The \texttt{Makefile} in the \texttt{logbook} folder is a simple example.
 It compiles this PDF if \texttt{logbook.tex} or one of the elements of \texttt{\$(logbookentries)} is newer than \texttt{logbook.pdf}.
@@ -89,7 +90,7 @@ Here is an excerpt from the Makefile in a task called \texttt{LODES\_dataprepara
 This target \texttt{../output/lodes\_DetroitUA\_2010.dta} has four pre-requisites:
 \texttt{DetroitUA\_tract.do}, \texttt{programs.do}, the CSV file that we described downloading above, and the \texttt{output} folder.
 The recipe for this target is to run the Stata script \texttt{DetroitUA\_tract.do} (referenced by \texttt{\$<}).
-\$(STATA)\$ is an alias for how we invoke Stata
+\texttt{\$(STATA)} is an alias for how we invoke Stata
 (modified to return a proper exit status and work with SLURM, ignore those details for now).
 In lines 3-4, \texttt{ln -s} creates a symbolic link called \texttt{../input/mi\_od\_main\_JT01\_2010.csv} that points to the upstream file
 \texttt{../../LODES\_downloaddata/output/mi\_od\_main\_JT01\_2010.csv}.
@@ -97,10 +98,12 @@ The final two lines define a generic recipe for producing upstream content.
 The \texttt{\%} is a wildcard, so this recipe will be used for \textit{any} target whose path starts with \texttt{../../}.
 \texttt{../../LODES\_downloaddata/output/mi\_od\_main\_JT01\_2010.csv} is an example of such a target.
 If this file isn't already available,
-the recipe runs \texttt{make} in the upstream folder 
+the recipe runs \texttt{make ../output/<target name>} in the upstream folder 
 \texttt{../../LODES\_downloaddata/code}.
-Notice that it invokes a different Makefile (the one assumed to be in the \texttt{LODES\_downloaddata} task)
-in order to produce the target.
+We achieve this by using Make's \texttt{\$(dir)} and \texttt{\$(notdir)} functions that split a filepath (e.g., \texttt{\$@}) into the directory and filename components.
+Notice that this recipe invokes a different Makefile (the one assumed to be in the \texttt{LODES\_downloaddata} task)
+in order to produce the target,
+and it assumes the Makefile in \texttt{LODES\_downloaddata} task has a rule to build \texttt{../output/<target name>}.
 
 \subsection{Notes on writing Makefiles}
 
@@ -140,7 +143,7 @@ The simplest example would \texttt{\$(shell echo \{1..10\})}, which would return
 
 \textbf{Grouped targets}.
 Historically, Make (like most of neoclassical economics) has assumed 
-``\href{https://doi.org/10.2307/2525367 }{no joint production}''.
+``\href{https://doi.org/10.2307/2525367}{no joint production}''.
 If two targets are produced by the same recipe, Make assumes it needs to run the recipe twice.
 Consider this trivial shell script (\texttt{joint\_producer.sh})
 \begin{lstlisting}[language=bash]
@@ -175,22 +178,101 @@ Make 4.3 would not make the mistake of submitting two copies of the same job whe
 where the ampersand indicates grouped targets.
 I have typically refrained from using grouped targets because one cannot assume Make 4.3 will be available on most boxes (e.g., Midway2 is running GNU Make 3.82).
 
-A note on running Makefiles in a cluster computing environment that has a job scheduler:
-\begin{itemize}
-	\item A problem with batch jobs is that the shell sees the submission command as completed upon job submission any output files are produced.
-	Failing to see the output, Make will repeatedly submit the job.
-	\item You need the job submission command to not exit back to the shell until the job completes, so that the target will be produced before Make evaluates that recipe's success or failure.
-	\item With PBSPro's \texttt{qsub} at Census RDC, use \texttt{qsub -W block=true}.
-	\item With SLURM's \texttt{sbatch} at Chicago Midway, use \texttt{sbatch -W}.
-	\item Read \url{http://wresch.github.io/2012/11/01/qsub-submit-jobs-from-makefile.html} for more discussion of \texttt{qsub} and the \texttt{sbatch} \href{https://slurm.schedmd.com/sbatch.html}{manual} for discussion of \texttt{-W} or \texttt{--wait}.
-	\item I am not sure about the best practice for the Torque scheduler.
-\end{itemize}
+\subsection{Reduce redundancies using pattern rules}
+Minimizing redundancies lowers future maintenance costs and makes it easier to scale up.
+Fortunately, Makefile has 
+	\href{https://www.gnu.org/software/make/manual/html_node/Pattern-Rules.html}{pattern rules}
+	that allow us to combine repeated or similar rules.
+The basic idea is to use the wildcard \texttt{\%} to match the varying parts.
+Consider an example similar to the one in Section~\ref{some_simple_examples_of_makefiles},
+	but now we are also downloading data for 2011:
+\begin{lstlisting}[language=make]
+	all: ../output/mi_od_main_JT01_2010.csv ../output/mi_od_main_JT01_2011.csv
+	../output/mi_od_main_JT01_2010.csv: ../output/mi_od_main_JT01_2010.csv.gz
+		gunzip -c $< > $@
+	../output/mi_od_main_JT01_2011.csv: ../output/mi_od_main_JT01_2011.csv.gz
+		gunzip -c $< > $@
+	../output/mi_od_main_JT01_2010.csv.gz: | ../output
+		wget "https://lehd.ces.census.gov/data/lodes/LODES7/mi/od/$(@F)" -O ../output/$(@F)
+	../output/mi_od_main_JT01_2011.csv.gz: | ../output
+		wget "https://lehd.ces.census.gov/data/lodes/LODES7/mi/od/$(@F)" -O ../output/$(@F)
+	../output:
+		mkdir $@
+\end{lstlisting}
+Notice that \texttt{gunzip -c \$< > \$@}
+	and \texttt{wget "https://lehd.ces.census.gov/data/lodes/LODES7/mi/od/\$(@F)" -O ../output/\$(@F)}
+	appeared twice in the example.
+Moreover, the targets and prerequisites for the 2010 and 2011 data
+	only differ by the year in the filenames.
+Hence, we can consolidate these nearly redundant recipes by replacing the year
+	in the targets and prerequisites with \texttt{\%}.
+The consolidated, pattern-matching version of the example above is
+\begin{lstlisting}[language=make]
+	all: ../output/mi_od_main_JT01_2010.csv ../output/mi_od_main_JT01_2011.csv
+	../output/mi_od_main_JT01_%.csv: ../output/mi_od_main_JT01_%.csv.gz
+		gunzip -c $< > $@
+	../output/mi_od_main_JT01_%.csv.gz: | ../output
+		wget "https://lehd.ces.census.gov/data/lodes/LODES7/mi/od/$(@F)" -O ../output/$(@F)
+	../output:
+		mkdir $@
+\end{lstlisting}
+Note: the \texttt{\%} in the prerequisite(s) will automatically be
+	replaced with the the matched string from the \texttt{\%} in the target.
+Pattern rules also allow for multiple targets,
+	but all targets must be patterns
+	(have \texttt{\%} in the names).
+Furthermore, when two targets from the same rule have the same matched string,
+	the rule will only be executed once;
+	please see this
+	\href{https://stackoverflow.com/questions/13945091/make-error-of-mixed-implicit-and-normal-rules}{stackoverflow post}
+	for more details.
+There are other ways of reducing redundancies in Makefiles,
+	like \href{https://www.gnu.org/software/make/manual/html_node/Implicit-Rules.html#Implicit-Rules}{implicit rules},
+	\href{https://www.gnu.org/software/make/manual/html_node/Double_002dColon.html}{double-colon rules},
+	and \href{https://www.gnu.org/software/make/manual/html_node/Secondary-Expansion.html}{secondary expansion}.
 
+Unfortunately, using pattern rules can produce opaque error messages.
+A target matches a pattern rule when the target pattern matches the target to be built
+and
+all the prerequisites exist or can be built.
+Therefore, if one of the prerequisites does not exist
+	and there is no rule to build it,
+	rather than seeing \texttt{No rule to make target `<prerequisite name>'},
+	you will see \texttt{No rule to make target `<target name>'}.
+The absence of the prerequisite (or a rule for the prerequisite) is reported
+	as the absence of a rule for the target because it didn't match the pattern rule.
+Suppose we have the following Makefile with an explicit rule:
+\begin{lstlisting}[language=make]
+	all: foo.csv
+	foo.csv: foo.dta
+\end{lstlisting}
+If \texttt{foo.dta} does not exist, when running \texttt{make},
+	we will see \texttt{No rule to make target `foo.dta'}.
+By contrast, suppose we have the following Makefile using a pattern rule:
+\begin{lstlisting}[language=make]
+	all: foo.csv
+	%.csv: %.dta
+\end{lstlisting}
+If \texttt{foo.dta} does not exist, when running \texttt{make},
+	we will see \texttt{No rule to make target `foo.csv'}.
+This might not seem like a huge problem in our simple example,
+	but, when you have a long makefile with multiple pattern rules chained together,
+	it can be hard to find the missing link.
+You can guard against this by specifying the targets that can match the pattern:
+\begin{lstlisting}[language=make]
+	all: foo.csv
+	foo.csv: %.csv: %.dta
+\end{lstlisting}
+This approach returns the error message \texttt{No rule to make target `foo.dta', needed by `foo.csv'.}
+Of course, if you want to build a file ending in \texttt{.csv} that is not \texttt{foo.csv},
+	this pattern rule will not match it.
+You would need to add that filename to the list preceding the colon before \texttt{\%.csv}.
 
-The following options are often relevant:
+\subsection{Running Make}
+When invoking Make, the following options are often relevant:
 \begin{itemize}
 	\item \texttt{-n}: Prints the recipes that would be executed without executing them. Great to preview what jobs you're going to launch by running Make.
-	\item \texttt{-j}: this option allows parallelization of jobs, i.e., contemporaneous execution of several recepies.
+	\item \texttt{-j}: this option allows parallelization of jobs, i.e., contemporaneous execution of several recipes.
 	Normally, make executes one recipe at a time, but \texttt{-j} enables simultaneous execution.
 	\texttt{-j} is followed by an integer specifying the number of parallel processes.
 	The default number of jobs run is 1 (serial processing).
@@ -198,4 +280,30 @@ The following options are often relevant:
 	We make use of 2 suboptions of \texttt{--debug}: ``basic'' and ``verbose''.
 	When the ``basic'' suboption is used, make will print each target that is found out-of-date and the status of the update action.
 	``verbose'' replicates the ``basic'' suboption and includes additional information about files that were parsed, prerequisites that did not need to be rebuilt, etc.
+\end{itemize}
+
+A note on running Makefiles in a cluster computing environment that has a job scheduler:
+\begin{itemize}
+	\item A problem with batch jobs is that the shell sees the submission command as completed upon job submission any output files are produced.
+	Failing to see the output, Make will repeatedly submit the job.
+	\item You need the job submission command to not exit back to the shell until the job completes, so that the target will be produced before Make evaluates that recipe's success or failure.
+	\item With PBSPro's \texttt{qsub} at Census RDC, use \texttt{qsub -W block=true}.
+	\item With SLURM's \texttt{sbatch} at Chicago Midway, use \texttt{sbatch -W} or \texttt{srun}%
+		\footnote{
+			Please refer to this \href{https://stackoverflow.com/questions/43767866/slurm-srun-vs-sbatch-and-their-parameters}{stackoverflow post}
+				for details on the differences
+				between \texttt{sbatch} and \texttt{srun}.
+			According to the SLURM documentation,
+				``\texttt{srun} is used to submit a job for execution in real time'',
+				while ``\texttt{sbatch} is used to submit a job script for later execution.''
+			In essence, \texttt{srun} is interactive and blocking
+				(output are in your terminal ,and
+				you can't do anything in the terminal until \texttt{srun} is finished),
+				while \texttt{sbatch} is batch processing and non-blocking
+				(outputs are redirected to other files and,
+				without the \texttt{-W} flag,
+				you can run other command while \texttt{sbatch} is running).
+		}.
+	\item Read \url{http://wresch.github.io/2012/11/01/qsub-submit-jobs-from-makefile.html} for more discussion of \texttt{qsub} and the \texttt{sbatch} \href{https://slurm.schedmd.com/sbatch.html}{manual} for discussion of \texttt{-W} or \texttt{--wait}.
+	\item I am not sure about the best practice for the Torque scheduler.
 \end{itemize}
