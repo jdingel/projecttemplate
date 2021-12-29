@@ -16,6 +16,17 @@ It's light at the moment.
 	\end{itemize}
 \end{itemize}
 
+\subsubsection{Cleaning data}
+
+I agree with \href{https://web.stanford.edu/~gentzkow/research/CodeAndData.xhtml}{Gentzkow and Shapiro}
+that you should keep data in normalized files as long as possible.
+\begin{quote}
+First, store your raw data in normalized files that preserve the information in the original data source and follows the rules above.
+Don't worry about how you plan to use the data.
+Rather, imagine that you are preparing the data for release to a broad group of users with differing needs.
+Do this because you, yourself, are likely to want to use the data in ways you do not currently anticipate.
+\end{quote}
+
 \subsubsection{Do not hardcode values}
 
 While I haven't fully embraced the \href{https://en.wikipedia.org/wiki/Functional_programming}{functional programming paradigm},
@@ -72,9 +83,17 @@ See \url{https://github.com/jdingel/DavisDingelMonrasMorales} for an example of 
 
 Package dependencies should be identified by \texttt{requirements.txt} (Python), \texttt{Manifest.toml} (Julia), and so forth.
 Stata lacks a built-in package-dependency management tool.
+I just write a do file that installs all the packages, but there is no official requirements/manifest file.
+My understanding is that R doesn't do package management properly natively.
+I think you want something like ``packrat", but I have never used this myself.
+
 These requirements should be committed to the repo so that anyone cloning the repo on a new machine has everything they need defined.
 This is also \href{https://aeadataeditor.github.io/aea-de-guidance/preparing-for-data-deposit.html}{AEA journal policy}:
 ``packages/modules/etc. ... provide a setup program to install these (not manual instructions).''
+
+I tend to write package-installation scripts in a distinct task that covers all packages used in the project.
+The best reason to concentrate everything in one task is that oftentimes package installation requires internet access:
+on RCC, login nodes can touch the external internet, while compute nodes cannot.
 
 \subsection{Limit lines to at most 100 characters}
 
