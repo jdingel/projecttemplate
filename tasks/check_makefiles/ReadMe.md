@@ -3,7 +3,7 @@
 This task includes bash scripts to verify the makefiles in the repo.
 These are used by GitHub Actions.
 
-## CODE
+## Code
 * `check_makefiles.sh`:
 This script runs `make -n` for each task listed.  
 If an error occurs, the script exits with a non-zero exit code.
