@@ -10,7 +10,7 @@ TASKS="$@" # read in given tasks
 # if no task was given, run over all tasks with Makefiles
 if [ "$TASKS" == "" ]
 then
-    TASKS=$(find ../.. -name 'Makefile' | sed "s|/code/Makefile||" | sed "s|\.\./\.\./||" | grep -v '^reports$')
+    TASKS=$(find ../.. -name 'Makefile' | awk -F '/' '{print $3}')
 fi
 
 # default exit status
@@ -29,3 +29,4 @@ do
 done
 
 exit $status
+

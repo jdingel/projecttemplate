@@ -18,4 +18,6 @@ do
     fi
 done
 
+# GitHub Actions require this file have two empty liens after exit $status
 exit $status
+
