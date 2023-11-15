@@ -1,19 +1,13 @@
 ## DEFINITIONS
 
-FOLDERS = input
-PAPER_SECTIONS = $(shell grep '\\input' paper.tex  | grep -v '%.*\\input' | sed 's/^.*\\input{\(.*\.tex\)}.*/\1/')
-#These two lines are commented out because paper.tex lacks content at the moment:
-#PAPER_INPUTS_TEX = $(shell grep '\\input{' $(PAPER_SECTIONS) | grep -v '%.*\\input' | sed 's/^.*\\input{\(.*\.tex\)}.*/\1/')
-#PAPER_INPUTS_IMG = $(shell grep --no-filename '\\includegraphics' $(PAPER_SECTIONS) | grep -v '%.*\\includegraphics' | sed 's/^.*\\includegraphics\[.*\]{\(.*\)}.*/\1/')
+PAPER_SECTIONS = $(shell grep -v '%.*input' paper.tex | grep -o 'sections/[A-Za-z_]*\.tex')
+PAPER_INPUTS = $(shell grep --no-filename 'input/' $(PAPER_SECTIONS) paper.tex | grep -v '^%.*\\input' | grep -o 'input/[A-Za-z0-9_\.\-]*\.[a-z]*')
 
 ## RECIPES
 
-all: $(FOLDERS) $(PAPER_INPUTS_TEX) $(PAPER_INPUTS_IMG) paper.pdf
+all: paper.pdf
 
-$(FOLDERS):
-	mkdir $@
-
-paper.pdf: paper.tex $(PAPER_INPUTS_TEX) $(PAPER_INPUTS_IMG)
+paper.pdf: paper.tex $(PAPER_INPUTS)
 	if command -v sbatch > /dev/null ; then module load texlive; fi
 	pdflatex -draftmode paper.tex
 	bibtex paper.aux
@@ -21,3 +15,6 @@ paper.pdf: paper.tex $(PAPER_INPUTS_TEX) $(PAPER_INPUTS_IMG)
 	pdflatex paper.tex
 	rm paper.log paper.aux paper.out
 	rm paper.bbl paper.blg
+
+input/:
+	mkdir $@
