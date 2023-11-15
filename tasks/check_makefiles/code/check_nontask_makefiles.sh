@@ -18,6 +18,5 @@ do
     fi
 done
 
-# GitHub Actions require this file have two empty lines after exit $status (hypothesis?)
 exit $status
 
