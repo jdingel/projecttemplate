@@ -1,9 +1,38 @@
-These are Jonathan's standards and he's willing to argue for them.
+These are Jonathan's standards, and he's willing to argue for them.
 
 \begin{itemize}
-	\item Generally, follow Edward Tufte's \href{https://www.edwardtufte.com/tufte/books_vdqi}{\textit{Visual Display of Quantitative Information}}. 
+	\item Generally, follow Edward Tufte's \href{https://www.edwardtufte.com/tufte/books_vdqi}{\textit{Visual Display of Quantitative Information}}.
 	Mostly important, maximize the \href{https://www.coursera.org/learn/python-plotting/lecture/qFnP9/graphical-heuristics-data-ink-ratio-edward-tufte}{data-ink ratio}.
-	\item At minimum, let's adhere to Schwabish ``\href{https://www.aeaweb.org/articles?id=10.1257/jep.28.1.209}{An Economist's Guide to Visualizing Data}'' (\textit{JEP} 2014) 
+	\item At minimum, let's adhere to Schwabish ``\href{https://www.aeaweb.org/articles?id=10.1257/jep.28.1.209}{An Economist's Guide to Visualizing Data}'' (\textit{JEP} 2014)
 	\item Never make a graphic with fewer than a dozen data points. A dozen data points belong in a table.
 	\item Please impose \texttt{graphregion(color(white))} on every \texttt{twoway} plot created in Stata.
+\end{itemize}
+
+Jonathan's projects also typically adhere to these additional guidelines:
+\begin{itemize}
+\item
+We want our figures to be interpretable in black and white, in case
+someone prints the slides or paper.
+Differentiate lines and points by pattern or symbol in addition to color.
+\item
+Stata legends should not have borders.
+Use \texttt{lcolor(white)} within the \texttt{legend()} option in \texttt{twoway} graphs
+(\texttt{lstyle(none)} leaves a light gray box).
+\item
+Use \texttt{bottomrule}, \texttt{toprule}, and \texttt{midrule} from the \texttt{booktabs} package
+instead of \texttt{hline} to make \LaTeX\:tables look nicer.
+\item
+We may want different notes in the slides, paper, and logbook for the same figure or table.
+Therefore, write the notes for an exhibit in the \LaTeX\:file that contains it
+(or, at minimum, to a separate \LaTeX\:file), not directly onto the exhibit.
+\item
+Similarly, do not make the title of an exhibit part of the image itself.
+We write them in the \LaTeX\:files instead.
+\item
+A figure that is easy to read in the paper may be annoying to read
+when you are in the back of a long room watching a presentation on a projector.
+For this reason, we sometimes generate a slides version of a figure with larger text and/or symbols.
+\item
+In general, err on the side of making the text on axis labels larger for all versions of figures.
+It is rare to overshoot and have text that is too large.
 \end{itemize}
