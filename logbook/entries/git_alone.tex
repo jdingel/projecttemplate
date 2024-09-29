@@ -57,7 +57,7 @@ To productively use git in a single-machine environment, you only need to know a
 \item \texttt{git commit} commits a set of changes
 \item \texttt{git log} lists the history of commits
 \end{itemize}
-See ``\href{https://git-scm.com/book/en/v1/Git-Basics}{Git Basics}'' on these.
+See ``\href{https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository}{Git Basics}'' on these.
 
 A couple more resources:
 \begin{itemize}
@@ -132,3 +132,55 @@ In some case, you might want to undo your last commit.
 To do that, use \texttt{git reset --soft HEAD\texttt{$\sim$}1}.
 This command will remove the last commit from the current branch and keep previously commited files in the staged area.
 For a more detailed description, see \href{https://www.atlassian.com/git/tutorials/undoing-changes/git-reset}{Atlassian guide}.
+
+\subsubsection{More notes on \texttt{git diff}}
+The options \texttt{--name-only}, \texttt{--name-status}, and \texttt{--compact-summary} are quite helpful.
+
+\texttt{git diff --name-only} shows only which files have changed, not the changed contents.
+\begin{lstlisting}[language=bash]
+jdingel$ git diff HEAD --name-only
+logbook/entries/gettingstarted.tex
+logbook/entries/git_alone.tex
+logbook/entries/git_together.tex
+logbook/entries/researchinfrastructure.tex
+logbook/logbook.tex
+\end{lstlisting}
+
+\texttt{git diff --name-status} shows whether files are added (A), modified (M), deleted (D), or renamed (R).
+This branch has added \texttt{gettingstarted.tex} and renamed \texttt{asana.tex} to \texttt{taskassignments.tex}.
+\begin{lstlisting}[language=bash]
+jdingel$ git diff origin/master --name-status
+M       logbook/entries/codereview.tex
+A       logbook/entries/gettingstarted.tex
+M       logbook/entries/git_alone.tex
+M       logbook/entries/git_together.tex
+M       logbook/entries/researchinfrastructure.tex
+M       logbook/entries/statanotes.tex
+R077    logbook/entries/asana.tex       logbook/entries/taskassignments.tex
+M       logbook/entries/visualization.tex
+M       logbook/logbook.tex
+\end{lstlisting}
+
+\texttt{git diff --compact-summary} shows you how much files have changed.
+When I added the first page of this logbook to the \texttt{README.md} file,
+85 lines of that file changed, but there were minor edits to four other files too.
+\begin{lstlisting}[language=bash]
+jdingel$ git log d3bc9642 | head
+commit d3bc96426aa929b39281816ec0fbfcbbdac104ee
+Author: JDingel <jdingel@chicagobooth.edu>
+Date:   Wed Mar 22 22:57:26 2023 -0500
+
+    Adds the first page of  to README.md
+
+commit 4ba5370eaf7b59e0dd29b0bbfefa8910d6c1250c
+Author: Jonathan Dingel <jdingel@chicagobooth.edu>
+Date:   Thu Jun 2 18:57:37 2022 -0500
+
+jdingel$ git diff 4ba5370eaf7b5 d3bc9642 --compact-summary
+ Makefile (new)                             |  7 +++++
+ README.md                                  | 85 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ header.md (new)                            | 11 +++++++
+ logbook/entries/researchinfrastructure.tex |  2 +-
+ logbook/entries/tasks.tex                  |  2 +-
+ 5 files changed, 104 insertions(+), 3 deletions(-)
+\end{lstlisting}
