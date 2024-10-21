@@ -284,7 +284,7 @@ When invoking Make, the following options are often relevant:
 
 A note on running Makefiles in a cluster computing environment that has a job scheduler:
 \begin{itemize}
-	\item A problem with batch jobs is that the shell sees the submission command as completed upon job submission any output files are produced.
+	\item A problem with batch jobs is that the shell sees the submission command as completed upon job submission, before any output files are produced.
 	Failing to see the output, Make will repeatedly submit the job.
 	\item You need the job submission command to not exit back to the shell until the job completes, so that the target will be produced before Make evaluates that recipe's success or failure.
 	\item With PBSPro's \texttt{qsub} at Census RDC, use \texttt{qsub -W block=true}.
