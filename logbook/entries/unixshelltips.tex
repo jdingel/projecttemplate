@@ -1,7 +1,45 @@
 \label{entry:unixshelltips}
 
-This section documents basic Unix/Linux shell commands and then some clever combinations for tasks we often encounter during research.
-At the command line, type \texttt{man <<command>>} to get the \href{https://en.wikipedia.org/wiki/Man_page}{manual page} for \texttt{<<comand>>}.
+After mentioning some tools you should install,
+this section documents basic Unix/Linux shell commands and then some clever combinations for tasks we often encounter during research.
+At the command line, type \texttt{man <<command>>} to get the \href{https://en.wikipedia.org/wiki/Man_page}{manual page} for \texttt{<<command>>}.
+
+\subsection{Tools to install}
+\begin{itemize}
+\item
+The \texttt{dot} command used in some graphing scripts like \texttt{task\_graph} requires Graphviz.
+Please follow \href{https://graphviz.org/download/}{these instructions} to install Graphviz.
+\item
+The \texttt{convert} command used to handle some images requires \href{https://imagemagick.org/index.php}{ImageMagick}.
+On a Mac using HomeBrew, run \texttt{brew install imagemagick}.
+\item 
+The \texttt{epstopdf} command requires Ghostscript.
+On a Mac using HomeBrew, run \texttt{brew install ghostscript}.
+\item 
+We generate CSV reports using GNU awk.
+On a Mac using HomeBrew, run \texttt{brew install gawk}.
+\item
+You should run the \texttt{setup\_environment} task when you initially clone the repository.
+This task installs required packages for Julia, Stata, R, etc.
+This task should be revised as the project's package requirements evolve.
+\item
+Our Makefiles assume that you can run the command \texttt{stata-se} from the command line. 
+You need to know about \href{https://www.stata.com/support/faqs/mac/advanced-topics/}{adding your Stata application to your PATH variable}.
+You might want to know about symbolic links placed in \texttt{/usr/local/bin}.
+For example, on one of my machines, the symbolic link is
+\texttt{/usr/local/bin/stata-se -> /Applications/Stata/StataMP.app/Contents/MacOS/stata-mp}
+\item
+We use Stata packages like \texttt{ppmlhdfe} that depend on the \texttt{gtools} package.
+If you get an error on your Mac that says something like ``Could not load gtools\_macosx\_v3.plugin'',
+see \url{https://github.com/mcaceresb/stata-gtools/issues/73}.
+\item
+Install Textidote via Homebrew or \url{https://github.com/sylvainhalle/textidote} to support its use in \texttt{paper/reviewing}
+\item
+For using Git at the command line, a very simple text editor like Nano suffices.
+Git's default text editor is Vim, which is painful if you don't know it (but apparently ecstasy for the enlightened few).
+Just set \texttt{git config --global core.editor "nano"}
+(\href{https://www.macinstruct.com/tutorials/how-to-set-nano-as-the-default-editor-for-git-on-your-mac/}{notes}).
+\end{itemize}
 
 \subsection{Mac OS X is Unix and POSIX-compliant, not GNU/Linux}
 
@@ -21,6 +59,15 @@ Here's a short list:
 	\item Other warnings (\href{https://unix.stackexchange.com/a/131940}{1},\href{https://stackoverflow.com/questions/1227174/sed-on-os-x-cant-seem-to-use-in-regexps}{2}), like the \texttt{-e} flag will give you extended regular expressions in OS X but isn't really compatible with Linux.
 \end{itemize}
 
+\item OS X uses BSD \texttt{grep}, which differs from GNU \texttt{grep}. 
+\begin{itemize}
+    \item When debugging an issue that stems from this, you can install GNU
+        \texttt{grep} on OS X with \texttt{brew install grep} and invoke it with \texttt{ggrep}.
+    \item BSD \texttt{grep} and GNU \texttt{grep} may respond differently to non-ASCII text encoding.
+        On GNU \texttt{grep}, this produces the warning message \texttt{[file]: binary file matches}.
+        If faced with this issue, use \texttt{grep -a} to interpret the file as text
+        and produce the same behavior across distributions.
+\end{itemize}
 
 \end{itemize}
 

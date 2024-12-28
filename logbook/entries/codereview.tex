@@ -31,7 +31,7 @@ Verify that committed reports and outputs match those generated on the reviewer'
 
 The person submitting the request---who
 will select themselves as the ``assignee'' on GitHub---should
-go through these steps before submitting a pull request
+also go through these steps before submitting a pull request
 to catch common bugs in advance.
 It is ideal if the reviewer can immediately focus on the substance of the code
 and not have to spend time notifying the assignee about errors in scripts or \texttt{Makefile}s.
@@ -124,6 +124,14 @@ you should add it to the appropriate \texttt{setup\_environment} file before
 submitting a pull request.
 This ensures that the code will run on other machines when proper setup
 instructions are followed.
+
+\subsubsection{Fix bugs separately}
+When you encounter a bug that is already present on the \texttt{main} branch,
+create a new branch with the bug fix and submit a new pull request.
+There is no reason to bundle a bug fix with the substantive work you were doing at the time you discovered the bug.
+People working on other branches will also encounter the bug during their work,
+because the problem is on the main branch.
+Fix it in a dedicated pull request that will be reviewed promptly.
 
 \subsection{Commenting on commits}
 

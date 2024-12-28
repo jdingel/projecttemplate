@@ -3,8 +3,33 @@ then being a Windows users can be tricky.
 The two parts of our workflow that are most difficult to implement on Windows
 are executing Makefiles and creating symbolic links.
 
-For now, we recommend simply installing Ubuntu on Windows Subsystem for Linux (WSL).
+My real recommendation is to get a Mac or Linux machine.
+
+If a team member is stuck on Windows,
+we recommend simply installing Ubuntu on Windows Subsystem for Linux (WSL).
 Here are instructions:
 \href{https://ubuntu.com/tutorials/install-ubuntu-on-wsl2-on-windows-10}{Install Ubuntu on WSL2 on Windows 10}.
 You will need to install the Linux versions of all applications, such as R, LaTeX, and Stata.
 This is genuine Ubuntu; it will not invoke your Windows executables.
+
+\subsection{A few details}
+
+\begin{itemize}
+\item
+The default system shell.
+If your team includes a WSL2 user,
+that user will need to
+change the default non-interactive shell in their Ubuntu installation
+or
+your team will need to declare \texttt{SHELL=bash} at top of each Makefile.
+One of these is necessary \href{https://wiki.ubuntu.com/DashAsBinSh}{because}
+``In Ubuntu 6.10, the default system shell, \texttt{/bin/sh}, was changed to dash (the Debian Almquist Shell); previously it had been bash (the GNU Bourne-Again Shell).''
+\item
+Stata will work on WSL2.
+\href{https://www.stata.com/products/linux/}{Stata says} ``Can my copy of Stata run on both my Linux desktop and Windows laptop?
+Yes. Stata licenses are not platform specific so you can use your license to install Stata on any of the supported platforms.''
+\item
+Windows uses different line endings than Mac and Linux.
+This is annoying.
+CLRF prefs need to be set in \texttt{.gitattributes} or in \texttt{.gitconfig} to set all file types to be LF instead of CRLF.
+\end{itemize}

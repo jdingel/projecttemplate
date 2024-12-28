@@ -1,6 +1,27 @@
 This section is for us to agree upon best practices in coding.
 It's light at the moment.
 
+\subsection{Writing code in a new task}
+
+To create a new task, start by creating a new branch and following these steps:
+\begin{enumerate}
+\item
+Start by writing the \texttt{readme.md} in the task folder.
+What is the purpose of this task?
+What information/inputs does it rely upon (at a broad level, not filenames)?
+What outputs will it produce?
+\item
+Next, write the \texttt{Makefile}.
+This approaches \href{https://en.wikipedia.org/wiki/Pseudocode}{pseudocode}: you list specific input files, you name output files, and there are to-be-written scripts that will produce those outputs from those inputs.
+\item
+Write the scripts that implements the task.
+As you handle the data, you might realize that you need to revise the readme or Makefile.
+You might need to split the task into multiple tasks if the steps between inputs and outputs are more complicated than your initial outline revealed.
+\item
+If your task products outputs, write a logbook entry presenting them.
+Exhibits aren't self-presenting.
+\end{enumerate}
+
 \subsection{Language-free coding principles}
 
 \subsubsection{Other people's principles}
@@ -15,6 +36,16 @@ It's light at the moment.
 	\item Maintain the correspondence between the whiteboard math and the code
 	\end{itemize}
 \end{itemize}
+
+\subsubsection{Validate arguments}
+
+If a script takes arguments when called, they must be validated.
+When the argument are parsed at the top of the script,
+verify they are the right type (e.g.,~the number of regions must be an integer or an expenditure share must lie between~0 and~1).
+\begin{lstlisting}[language=julia]
+alpha = parse(Float64,ARGS[1])
+@assert 0 < alpha <= 1
+\end{lstlisting}
 
 \subsubsection{Cleaning data}
 
@@ -93,7 +124,7 @@ This is also \href{https://aeadataeditor.github.io/aea-de-guidance/preparing-for
 
 I tend to write package-installation scripts in a distinct task that covers all packages used in the project.
 The best reason to concentrate everything in one task is that oftentimes package installation requires internet access:
-on RCC, login nodes can touch the external internet, while compute nodes cannot.
+on some computing clusters, login nodes can touch the external internet, while compute nodes cannot.
 
 \subsection{Limit lines to at most 100 characters}
 

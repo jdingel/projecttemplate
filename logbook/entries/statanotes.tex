@@ -1,6 +1,6 @@
 Stata usage among older economists may just reflect path dependence.
-It has a number of shortcomings, such as no proper package mangagement.
-Beware of dumb \href{https://ifs.org.uk/docs/stata_gotchasJan2014.pdf}{Stata gotchas}.
+It has a number of shortcomings, such as no proper package management.
+Beware of dumb \href{https://ifs.org.uk/sites/default/files/output_url_files/stata_gotchasJan2014.pdf}{Stata gotchas}.
 
 \subsubsection{Command-line execution}
 
@@ -41,3 +41,39 @@ gen byte positive2 = (inrange(x1,0,.)==1)
 \end{lstlisting}
 The first command will cause positive1 to be true if x1 is non-negative or if x1 is missing.
 By contrast, the second command will set positive2 to true only if x1 is non-negative and non-missing.
+
+\subsubsection{fontface}
+The Stata command to use Times New Roman in your PNG file is \texttt{graph set svg fontface "Times New Roman"}.
+Apparently Stata groups all rasterized image file types into \texttt{svg}.
+
+\subsubsection{Data in memory after an error}
+
+Stata may befuddle you.
+If you use the \texttt{preserve} command,
+the data in memory after your script returns an error may not be the data that was in memory at the time of the error:
+there is a \texttt{restore} operation after the error.
+
+Your \texttt{merge} that fails an \texttt{assert} may not show the observations that caused the assertion to be false:
+\begin{lstlisting}[language=stata]
+clear 
+tempfile tf1
+set obs 15
+gen id = _n
+save `tf1'
+keep if inrange(id,1,10)
+merge 1:1 id using `tf1', keep(match) assert(master match)
+\end{lstlisting}
+
+This fails because the \texttt{assert} is false.
+The crappy thing is that it is hard to debug because the ids 11-15 are not in memory, so when you look at the data after it breaks, you only see matches.
+It's like it applies the \texttt{keep()} after failing the assert!
+
+\begin{lstlisting}[language=stata]
+. tab _merge
+
+                 _merge |      Freq.     Percent        Cum.
+------------------------+-----------------------------------
+            matched (3) |         10      100.00      100.00
+------------------------+-----------------------------------
+                  Total |         10      100.00
+\end{lstlisting}
