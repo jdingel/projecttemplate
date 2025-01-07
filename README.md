@@ -24,8 +24,8 @@ We organize the project as a series of tasks, so our organization of
 code and data takes a task-based perspective. After writing code, we
 automate its execution via `make`. We track our code (and the rest of
 the project) using `Git`, a version control system. Collaboration occurs
-via Asana task assignments, GitHub/BitBucket code reviews, and logbook
-entries that share research designs and results.
+via issue/task assignments, pull requests, and logbook entries that
+share research designs and results.
 
 Use a good text editor like [SublimeText](https://www.sublimetext.com/),
 [Atom](https://atom.io/), or [VSCode](https://code.visualstudio.com/) to
@@ -34,13 +34,17 @@ editors](http://plain-text.co/write-and-edit.html). Your text editor
 should, at minimum, offer you [syntax
 highlighting](https://en.wikipedia.org/wiki/Syntax_highlighting), [tab
 autocomplete](https://en.wikipedia.org/wiki/Command-line_completion),
-and [multiple selection](https://www.sublimetext.com/).
+and [multiple selection](https://www.sublimetext.com/). We recommend
+VSCode, which supports Git, remote development via SSH, and a GitHub
+extension.
 
 Our approach assumes that you'll use Unix/Linux/MacOSX. Plain-text
 social science lives at the \*nix command line. [Gentzkow and
 Shapiro](https://github.com/gslab-econ/ra-manual/wiki/Getting-Started):
-"The command line is our means of implementing tools." Here are four
-intros to the Linux shell:
+"The command line is our means of implementing tools." Per [Janssens
+(2014)](https://jeroenjanssens.com/dsatcl/chapter-1-introduction.html#why-data-science-at-the-command-line):
+"the command line is: agile, augmenting, scalable, extensible, and
+ubiquitous." Here are four intros to the Linux shell:
 
 -   <https://ryanstutorials.net/linuxtutorial/>
 
@@ -56,9 +60,9 @@ intros to the Linux shell:
 
 Getting started at the command line can be a little overwhelming, but
 it's well worth it. While you can use GUI apps to interact with most of
-our workflow (e.g., SourceTree for version control), automation of some
-key parts relies on shell scripts. See logbook entry A.9 for a haphazard
-collection of shell tips.
+our workflow (e.g., GitHub Desktop), automation of some key parts relies
+on shell scripts. See logbook entry A.9 for a haphazard collection of
+shell tips.
 
 Beyond \*nix, the rest of the research workflow is language-agnostic: it
 applies to everything from Stata to Julia. In fact, the task-based
