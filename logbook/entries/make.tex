@@ -374,7 +374,7 @@ A note on running Makefiles in a cluster computing environment that has a job sc
 	Failing to see the output, Make will repeatedly submit the job.
 	\item You need the job submission command to not exit back to the shell until the job completes, so that the target will be produced before Make evaluates that recipe's success or failure.
 	\item With PBSPro's \texttt{qsub} at Census RDC, use \texttt{qsub -W block=true}.
-	\item With SLURM's \texttt{sbatch} at Chicago Midway, use \texttt{sbatch -W} or \texttt{srun}%
+	\item With SLURM's \texttt{sbatch} at Columbia, use \texttt{sbatch -W} or \texttt{srun}%
 		\footnote{
 			Please refer to this \href{https://stackoverflow.com/questions/43767866/slurm-srun-vs-sbatch-and-their-parameters}{stackoverflow post}
 				for details on the differences
