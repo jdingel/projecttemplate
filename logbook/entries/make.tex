@@ -28,6 +28,12 @@ Here are four written introductions to \texttt{make}, listed in the order that I
 \item Zachary M. Jones: \href{http://zmjones.com/make/}{GNU Make for Reproducible Data Analysis}
 \end{itemize}
 
+\subsection{A live example}
+
+I recommend playing with the
+\href{https://github.com/jdingel/DingelNeiman-workathome}{Dingel and Neiman (2020) replication package}
+to see a straightforward example of using \texttt{make} in a research project.
+
 \subsection{Some simple examples of Makefiles}
 \label{some_simple_examples_of_makefiles}
 
@@ -139,6 +145,8 @@ Commonly used functions include \texttt{foreach} for performing text substitutio
 and \texttt{addprefix} for prepending prefix in front of individual names.
 \item In addition to executing recipes in the shell, you can define Make variables using shell commands by invoking Make's \texttt{shell} command.
 The simplest example would \texttt{\$(shell echo \{1..10\})}, which would return the integers from 1 to 10 via Bash's \href{https://www.shell-tips.com/bash/seq-brace-expansion/}{brace expansion}.
+\item For clarity and readability of the Makefile you should list the outputs first, then temp, and then the inputs.
+In this way one reads the target (final output), sees pre-reqs, and then reads what those pre-reqs are.
 \end{itemize}
 
 \textbf{Grouped targets}.
@@ -178,12 +186,18 @@ Make 4.3 would not make the mistake of submitting two copies of the same job whe
 where the ampersand indicates grouped targets.
 I have typically refrained from using grouped targets because one cannot assume Make 4.3 will be available on most boxes (e.g., Midway2 is running GNU Make 3.82).
 
-\subsection{Reduce redundancies using pattern rules}
-Minimizing redundancies lowers future maintenance costs and makes it easier to scale up.
-Fortunately, Makefile has 
-	\href{https://www.gnu.org/software/make/manual/html_node/Pattern-Rules.html}{pattern rules}
-	that allow us to combine repeated or similar rules.
-The basic idea is to use the wildcard \texttt{\%} to match the varying parts.
+One strategy for reconciling joint production with parallel computation is to only list one of the group's targets in the \texttt{all} target.
+This causes Make to only execute each group's recipe once when \texttt{make} is invoked at the command line,
+but the Makefile still contains rules that define a recipe for every target.
+These will be appropriately invoked by downstream tasks if a particular target needs to be produced.
+
+\subsection{Pattern rules}
+Rather than writing an explicit rule for every single output in the Makefile,
+we can use 
+\href{https://www.gnu.org/software/make/manual/html_node/Pattern-Rules.html}{pattern rules}
+that cover multiple outputs.
+The basic idea is to use the wildcard \texttt{\%} to match the varying parts of repeated or similar rules.
+This makes it easier to scale up the Makefile.
 Consider an example similar to the one in Section~\ref{some_simple_examples_of_makefiles},
 	but now we are also downloading data for 2011:
 \begin{lstlisting}[language=make]
@@ -268,6 +282,78 @@ Of course, if you want to build a file ending in \texttt{.csv} that is not \text
 	this pattern rule will not match it.
 You would need to add that filename to the list preceding the colon before \texttt{\%.csv}.
 
+\subsection{Intermediate targets}
+
+When Make produces a chain of targets, you may not want to retain the intermediate targets.
+Consider a task that produces \texttt{output.tex} by first producing a very large CSV:
+\begin{lstlisting}[language=make]
+all: output.tex
+
+output.tex: script.R temp/hugefile.csv
+	Rscript $<
+
+temp/hugefile.csv: databuild.R input/data.csv
+	Rscript $<
+\end{lstlisting}
+If you run this Makefile when \texttt{output.tex} does not exist,
+Make will first check whether \texttt{script.R} and \texttt{temp/hugefile.csv} exist.
+Assuming the latter does not,
+Make will run the recipe to produce \texttt{temp/hugefile.csv}
+and
+then run the recipe to produce \texttt{output.tex}.
+You get the desired output file and also have a large CSV file sitting in the \texttt{temp} folder.
+
+If you declare \texttt{.INTERMEDIATE: temp/hugefile.csv},
+there are two consequences (\href{https://www.gnu.org/software/make/manual/html_node/Chained-Rules.html}{documentation}).
+First, Make will \textit{not} take the absence of \texttt{temp/hugefile.csv}
+as a reason to update \texttt{output.tex}.
+Second, when Make needs to create the CSV to create the output,
+Make will run the recipe to produce \texttt{temp/hugefile.csv},
+then run the recipe to produce \texttt{output.tex},
+and
+then delete \texttt{temp/hugefile.csv}.
+If you want the first consequence and not the second consequence,
+declare \texttt{.SECONDARY} instead of \texttt{.INTERMEDIATE}.
+
+Pre-requisites that are pattern-matched are intermediate by default.
+Here's a simple example:
+\begin{lstlisting}[language=make]
+all: thing.txt
+
+%.txt:  %.csv
+	md5 $< > $@
+
+%.csv:
+	echo $$RANDOM > $@
+\end{lstlisting}
+Running this Makefile yields the following:
+\begin{lstlisting}[language=bash]
+jdingel$ make -f test.make 
+echo $RANDOM > thing.csv
+md5 thing.csv > thing.txt
+rm thing.csv
+\end{lstlisting}
+If you do not want pattern-matched pre-reqs to be deleted,
+you must declare them \href{https://www.gnu.org/software/make/manual/html_node/Special-Targets.html}{precious} using \texttt{.PRECIOUS}.
+(You need to write the pattern in the same way as it appears in the relevant rule.)
+
+\subsection{Parsing scripts for pre-requisites}
+
+If your script uses an input that isn't listed in the Makefile,
+Make will not create the input and you will only see the error at the time the script runs.
+Rather than editing the Makefile to update the list of pre-requisites when you edit the script,
+you can use shell commands to automatically parse the script to identify inputs.
+Here is an excerpt from a Makefile that parses the Stata script \texttt{zip\_ptaxcode.do} to identify its inputs.
+\begin{lstlisting}[language=make]
+../output/ZIP_PTAX_201712.txt: zip_ptaxcode.do $(shell grep -o '../input/[A-Za-z0-9_]*\.[a-z]*' zip_ptaxcode.do) | ../output ../report run.sbatch
+	$(STATA) $<
+\end{lstlisting}
+Whenever the Stata script changes, the Makefile pre-requisites immediately reflect that,
+so long as the pre-requisites take the form of file paths that start with \texttt{../input}, contain the expected characters, and end in an alphabetical file extension.
+
+This strategy is more difficult to implement when the input path contains variables defined within the script,
+as the simple \texttt{grep} match must be extended to substitute in the variable values.
+
 \subsection{Running Make}
 When invoking Make, the following options are often relevant:
 \begin{itemize}
@@ -284,11 +370,11 @@ When invoking Make, the following options are often relevant:
 
 A note on running Makefiles in a cluster computing environment that has a job scheduler:
 \begin{itemize}
-	\item A problem with batch jobs is that the shell sees the submission command as completed upon job submission any output files are produced.
+	\item A problem with batch jobs is that the shell sees the submission command as completed upon job submission, before any output files are produced.
 	Failing to see the output, Make will repeatedly submit the job.
 	\item You need the job submission command to not exit back to the shell until the job completes, so that the target will be produced before Make evaluates that recipe's success or failure.
 	\item With PBSPro's \texttt{qsub} at Census RDC, use \texttt{qsub -W block=true}.
-	\item With SLURM's \texttt{sbatch} at Chicago Midway, use \texttt{sbatch -W} or \texttt{srun}%
+	\item With SLURM's \texttt{sbatch} at Columbia, use \texttt{sbatch -W} or \texttt{srun}%
 		\footnote{
 			Please refer to this \href{https://stackoverflow.com/questions/43767866/slurm-srun-vs-sbatch-and-their-parameters}{stackoverflow post}
 				for details on the differences
@@ -307,3 +393,4 @@ A note on running Makefiles in a cluster computing environment that has a job sc
 	\item Read \url{http://wresch.github.io/2012/11/01/qsub-submit-jobs-from-makefile.html} for more discussion of \texttt{qsub} and the \texttt{sbatch} \href{https://slurm.schedmd.com/sbatch.html}{manual} for discussion of \texttt{-W} or \texttt{--wait}.
 	\item I am not sure about the best practice for the Torque scheduler.
 \end{itemize}
+

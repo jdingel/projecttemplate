@@ -27,11 +27,11 @@ While you can run Git from the command line,
 you might find it a little easier to have a GUI as you learn Git.
 I recommend using the \href{https://code.visualstudio.com/docs/sourcecontrol/overview}{Git tools that are integrated into VSCode}, my preferred text editor.
 Other options are 
-\href{https://github.com/apps/desktop}{GitHub Desktop} and \href{https://www.sourcetreeapp.com/}{SourceTree} (for MacOS).\footnote{
-	Some of my coauthors have had poor experiences using SourceTree on their Windows machines.
-}
+\href{https://github.com/apps/desktop}{GitHub Desktop} and \href{https://www.sourcetreeapp.com/}{SourceTree} (for MacOS).
 SourceTree is by Atlassian, the folks also behind BitBucket.
 You can \href{https://confluence.atlassian.com/get-started-with-sourcetree/work-using-git-847359053.html}{use the app to} pull, commit, push, diff, etc.
+Some of my coauthors have had poor experiences using SourceTree on their Windows machines.
+If you're on Windows, perhaps try \href{https://desktop.github.com/}{GitHub Desktop} or \href{https://www.gitkraken.com/}{GitKraken}.
 
 \subsection{Clone the remote repo}
 
@@ -56,6 +56,10 @@ button and you'll be prompted to clone the repository to your own machine using 
 Name the folder on your machine, and a copy of all the files in the remote repository will be cloned to your local repository.
 
 It's also possible to clone remote repositories to which you have access simply by opening the SourceTree app and following \href{https://confluence.atlassian.com/get-started-with-sourcetree/clone-a-remote-repository-847359098.html}{these instructions}.
+
+You'll want to set the username and email address in your \texttt{.gitconfig} file
+to match the email address you're using on \href{http://www.github.com}{GitHub.com} or \href{http://www.bitbucket.org}{BitBucket.org}
+so that commits are properly associated with your user account.
 
 \subsubsection{Pull and push}
 
