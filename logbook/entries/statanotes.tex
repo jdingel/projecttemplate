@@ -6,7 +6,7 @@ Beware of dumb \href{https://ifs.org.uk/sites/default/files/output_url_files/sta
 
 For old versions (before Stata 16), a few Stata commands only work in ``interactive'' mode and not when Stata is invoked at the command line.
 \begin{itemize}
-	\item \texttt{graph export}: 
+	\item \texttt{graph export}:
 	``ps and eps are available for all versions of Stata; png and tif are available for all versions of Stata except Stata(console) for Unix; pdf is available only for Stata for Windows and Stata for Mac.''
 	See \url{https://www.stata.com/manuals13/g-2graphexport.pdf#g-2graphexport}.
 	We usually choose eps format.
@@ -14,7 +14,7 @@ For old versions (before Stata 16), a few Stata commands only work in ``interact
 
 
 \subsubsection{Temporary files}
-Stata loads at most one dataset at a time, 
+Stata (prior to version 16) loads at most one dataset at a time,
 thus opening a dataset will cause Stata to discard the dataset that is currently in memory.
 This constraint may push you to consider saving lots of intermediate output or temporary files to the \texttt{output} folder of your task.
 Don't.
