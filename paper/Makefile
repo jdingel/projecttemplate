@@ -9,12 +9,18 @@ all: paper.pdf
 
 paper.pdf: paper.tex $(PAPER_INPUTS)
 	if command -v sbatch > /dev/null ; then module load texlive; fi
-	pdflatex -draftmode paper.tex
-	bibtex paper.aux
-	pdflatex -draftmode paper.tex
-	pdflatex paper.tex
-	rm paper.log paper.aux paper.out
-	rm paper.bbl paper.blg
+	pdflatex -draftmode $<
+	bibtex $(basename $<).aux
+	pdflatex -draftmode $<
+	pdflatex $<
+	rm $(addprefix $(basename $<), .aux .log .out)
+	-rm $(addprefix $(basename $<), .bbl .blg)
+
+.PHONY: clean inputs
+clean:
+	-rm *.aux *.log *.out
+	-rm *.toc *.bbl *.blg
+inputs: $(PAPER_INPUTS)
 
 input/:
 	mkdir $@
