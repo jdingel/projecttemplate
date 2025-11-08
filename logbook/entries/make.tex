@@ -25,7 +25,7 @@ Here are four written introductions to \texttt{make}, listed in the order that I
 \item Mike Bostock: \href{https://bost.ocks.org/mike/make/}{Why Use Make}
 \item Karl Broman: \href{http://kbroman.org/minimal_make/}{minimal make}
 \item Kieran Healy: \href{http://plain-text.co/pull-it-together.html}{Pull It Together} (The Plain Person's Guide to Plain Text Social Science)
-\item Zachary M. Jones: \href{http://zmjones.com/make/}{GNU Make for Reproducible Data Analysis}
+\item Zachary M. Jones: \href{https://web.archive.org/web/20240222042605/http://zmjones.com/make/}{GNU Make for Reproducible Data Analysis}
 \end{itemize}
 
 \subsection{A live example}
@@ -394,3 +394,11 @@ A note on running Makefiles in a cluster computing environment that has a job sc
 	\item I am not sure about the best practice for the Torque scheduler.
 \end{itemize}
 
+\subsection{Validating Makefiles}
+
+A semi-common mistake is to submit a Makefile that only worked on your machine because of the state of the files.
+For example, an input existed on your machine, so you forgot to supply a rule to produce that input,
+which others will need.
+There is a shell script in the task \texttt{actions\_scripts} that executes \texttt{make -n} on every Makefile in the \texttt{tasks} folder to validate them.
+This script is run automatically as a GitHub action when a pull request is submitted for review.
+The script accepts a list of tasks as its argument if you want to only validate a subset of tasks.
