@@ -11,6 +11,8 @@ run.sbatch: ../../setup_environment/code/run.sbatch | slurmlogs
 	ln -sf $< $@
 ../input/Manifest.toml: ../../setup_environment/output/Manifest.toml | ../input
 	ln -sf $< $@
+profile.do: ../../setup_environment/code/profile.do
+	ln -sf $< $@
 
 .PRECIOUS: ../../%
 ../../%: #Generic recipe to produce outputs from upstream tasks
