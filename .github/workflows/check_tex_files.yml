@@ -1,0 +1,66 @@
+name: Compile slides and paper
+
+on:
+  pull_request:
+    types: [opened, reopened, review_requested, ready_for_review]
+  workflow_dispatch:
+
+jobs:
+  build_latex:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step to check out the repository
+      - uses: actions/checkout@v4
+
+      # Make inputs for paper
+      - name: Make inputs for paper
+        run: |
+          cd paper
+          make inputs
+
+      # Make inputs for slides
+      - name: Make inputs for slides
+        run: |
+          cd slides
+          make inputs
+
+      # Step to compile the paper
+      - name: Compile paper
+        shell: bash
+        run: |
+          bash "./tasks/actions_scripts/code/check_tex_files.sh"
+        env:
+          INPUT_ROOT_FILE: paper.tex
+          INPUT_WORKING_DIRECTORY: ./paper/
+          INPUT_WORK_IN_ROOT_FILE_DIR: "false"
+          INPUT_CONTINUE_ON_ERROR: "true"
+          INPUT_COMPILER: latexmk
+          INPUT_ARGS: "-pdf -file-line-error -halt-on-error -interaction=nonstopmode"
+          INPUT_EXTRA_SYSTEM_PACKAGES: ""
+          INPUT_EXTRA_FONTS: ""
+          INPUT_PRE_COMPILE: ""
+          INPUT_POST_COMPILE: ""
+          INPUT_LATEXMK_SHELL_ESCAPE: "true"
+          INPUT_LATEXMK_USE_LUALATEX: "false"
+          INPUT_LATEXMK_USE_XELATEX: "false"
+
+      # Step to compile the slides
+      - name: Compile slides
+        shell: bash
+        run: |
+          bash "./tasks/actions_scripts/code/check_tex_files.sh"
+        env:
+          INPUT_ROOT_FILE: slides.tex
+          INPUT_WORKING_DIRECTORY: ./slides/
+          INPUT_WORK_IN_ROOT_FILE_DIR: "false"
+          INPUT_CONTINUE_ON_ERROR: "true"
+          INPUT_COMPILER: latexmk
+          INPUT_ARGS: "-pdf -file-line-error -halt-on-error -interaction=nonstopmode"
+          INPUT_EXTRA_SYSTEM_PACKAGES: ""
+          INPUT_EXTRA_FONTS: ""
+          INPUT_PRE_COMPILE: ""
+          INPUT_POST_COMPILE: ""
+          INPUT_LATEXMK_SHELL_ESCAPE: "true"
+          INPUT_LATEXMK_USE_LUALATEX: "false"
+          INPUT_LATEXMK_USE_XELATEX: "false"

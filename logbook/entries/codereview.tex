@@ -6,7 +6,9 @@ Another is that threaded conversations are much cleaner than writing back-and-fo
 \subsection{Code review process}\label{code_review_process}
 Given a task, the default process for writing code and submitting it for review is the following:
 \begin{enumerate}
-\item Create a new branch when you create a new task (\href{https://github.com/gslab-econ/ra-manual/wiki/Tasks}{G\&S}: ``The assignee should create a separate git branch for each task that involves code or output stored in the repository.'')
+\item Create a new branch when you create a new task 
+(\href{https://github.com/gslab-econ/ra-manual/wiki/Tasks}{G\&S}: ``The assignee should create a separate git branch for each task that involves code or output stored in the repository.'')
+Either (1) create it on the remote repo using the GitHub web interface and then fetch and check it out or (2) create it locally and then push it to the remote repo.
 \item Commit your work on this new branch. A complete task includes a \texttt{Makefile}.
 \item In addition to creating a \texttt{code} folder, write a \texttt{readme.md} in the task folder that explains what it does.
 \item Submit a pull request when your code is ready to be reviewed.
@@ -22,7 +24,10 @@ A reviewer will typically execute the following steps when reviewing a pull requ
     (Note: in order for the graph to be informative, your branch must be up-to-date with main.)
 \item Referencing \texttt{task\_flow\_branchdiff.png},
     delete all input and output folders in the tasks that were created or
-    modified on the branch.
+    modified on the branch.\footnote{An exception to this rule:
+    it would be costly to delete the output folder of \texttt{download\_data} every time,
+    as it bundles all downloads. Instead, only delete the outputs that are relevant to the changes
+    on the branch.}
 \item Run \texttt{make} in the tasks that were created or modified on the branch.
 Verify that committed reports and outputs match those generated on the reviewer's machine.
 \item Review the code.
@@ -42,7 +47,7 @@ You can see the status of these checks on the GitHub pull request page.
 If any fail,
 fix the mistakes and then re-request review to run the checks again.
 Note that you can also run the checks manually by executing the shell
-scripts in \texttt{tasks/check\_makefiles}.
+scripts in \texttt{tasks/actions\_scripts}.
 Similarly, running \texttt{make} in \texttt{tasks/maintenance} flags scripts and \texttt{Makefile}s that
 violate best practices or our style preferences.
 
